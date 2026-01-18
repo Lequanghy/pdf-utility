@@ -1,10 +1,25 @@
+# netlify.toml — Configuration for Netlify builds and hosting
+
 [build]
-  publish = "."         
-  command = "npm run build"          
+  # The command that builds your SvelteKit app
+  command = "npm run build"     # or "yarn build" / "pnpm build" if you use those
 
+  # The folder Netlify should serve as the published site
+  publish = "build"             # Default output folder from adapter-static
 
+  # Optional: Environment variables (if needed for Node version or other settings)
+  # environment = { NODE_VERSION = "22" }   # Uncomment and adjust if you need a specific Node version
+
+# Critical for SPA / client-side routing (prevents 404 on refresh / direct links)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = true                  # Ensures rewrite even if a file exists with same path
+
+# Optional: Force HTTPS (Netlify enables this by default anyway)
+[[redirects]]
+  from = "http://*"
+  to = "https://:splat"
+  status = 301
   force = true
