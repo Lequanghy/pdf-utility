@@ -160,7 +160,7 @@
 						? 'border-primary text-primary border-b-4'
 						: 'text-gray-600 hover:text-gray-900'}"
 				>
-					Merge PDFs
+					Merge
 				</button>
 				<button
 					onclick={() => (mode = 'split')}
@@ -169,7 +169,7 @@
 						? 'border-primary text-primary border-b-4'
 						: 'text-gray-600 hover:text-gray-900'}"
 				>
-					Split PDF
+					Split
 				</button>
 			</div>
 
@@ -239,8 +239,8 @@
 							disabled={mergeFiles.length === 0 || isMerging}
 							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isMerging || mergeFiles.length === 0
-								? 'cursor-not-allowed bg-gray-400'
-								: 'bg-primary hover:bg-primarydark'}"
+								? 'cursor-not-allowed bg-gray-500'
+								: 'bg-gray-500 hover:bg-gray-900'}"
 						>
 							{isMerging
 								? 'Merging…'
@@ -335,7 +335,7 @@
 							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isSplitting || !splitPdfDoc
 								? 'cursor-not-allowed bg-gray-400'
-								: 'bg-primary hover:bg-primarydark'}"
+								: 'bg-gray-500 hover:bg-gray-900'}"
 						>
 							{isSplitting
 								? 'Splitting…'
