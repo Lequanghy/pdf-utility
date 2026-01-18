@@ -8,14 +8,10 @@ const config = {
 	kit: {
 		adapter: adapter({
 			out: 'build', // default
-			precompress: false, // optional
-			envPrefix: 'SVELTE_', // optional
-			polyfills: true // helps with some Node compat
-		}),
-		// For a pure client-side app like yours, these help avoid SSR issues
-		csr: true,
-		ssr: false, // disable server-side rendering
-		prerender: { entries: [] } // no prerendering needed
+			precompress: false,
+			envPrefix: 'SVELTE_',
+			polyfills: true
+		})
 	}
 };
 
