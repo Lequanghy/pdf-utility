@@ -177,7 +177,7 @@
 			{#if mode === 'merge'}
 				<div class="px-8 pt-8">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs</h2>
-					<p class="mb-6 text-gray-600">Combine multiple PDFs into one — all in your browser</p>
+					<p class="mb-6 text-gray-600">Combine multiple PDFs into one</p>
 
 					<label
 						for="merge-upload"
@@ -257,9 +257,7 @@
 			{#if mode === 'split'}
 				<div class="px-8 pt-8">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
-					<p class="mb-6 text-gray-600">
-						Extract pages or split into single-page files — locally in browser
-					</p>
+					<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
 
 					<label
 						for="split-upload"
