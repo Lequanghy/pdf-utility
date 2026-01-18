@@ -138,7 +138,7 @@
 	}
 
 	function download(bytes: Uint8Array, filename: string) {
-		const blob = new Blob([bytes], { type: 'application/pdf' });
+		const blob = new Blob([new Uint8Array(bytes)], { type: 'application/pdf' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
@@ -154,7 +154,7 @@
 			<!-- Mode Tabs -->
 			<div class="flex border-b border-gray-200">
 				<button
-					on:click={() => (mode = 'merge')}
+					onclick={() => (mode = 'merge')}
 					class="flex-1 py-5 text-center font-medium transition-colors
                  {mode === 'merge'
 						? 'border-primary text-primary border-b-4'
@@ -163,7 +163,7 @@
 					Merge PDFs
 				</button>
 				<button
-					on:click={() => (mode = 'split')}
+					onclick={() => (mode = 'split')}
 					class="flex-1 py-5 text-center font-medium transition-colors
                  {mode === 'split'
 						? 'border-primary text-primary border-b-4'
@@ -189,7 +189,7 @@
 							multiple
 							accept="application/pdf"
 							class="sr-only"
-							on:change={(e) => handleMergeFiles(e.currentTarget.files)}
+							onchange={(e) => handleMergeFiles(e.currentTarget.files)}
 						/>
 						<svg
 							class="mx-auto mb-4 h-16 w-16 text-blue-500"
@@ -223,7 +223,7 @@
 										</div>
 									</div>
 									<button
-										on:click={() => removeMergeFile(i)}
+										onclick={() => removeMergeFile(i)}
 										class="ml-4 text-red-600 hover:text-red-800">Remove</button
 									>
 								</div>
@@ -235,7 +235,7 @@
 				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
 					<div class="flex justify-center">
 						<button
-							on:click={mergePDFs}
+							onclick={mergePDFs}
 							disabled={mergeFiles.length === 0 || isMerging}
 							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isMerging || mergeFiles.length === 0
@@ -268,7 +268,7 @@
 							type="file"
 							accept="application/pdf"
 							class="sr-only"
-							on:change={(e) => handleSplitFile(e.currentTarget.files)}
+							onchange={(e) => handleSplitFile(e.currentTarget.files)}
 						/>
 						<svg
 							class="mx-auto mb-4 h-16 w-16 text-blue-500"
@@ -306,7 +306,7 @@
 
 							{#if splitMode === 'range'}
 								<div class="mt-4">
-									<label class="mb-2 block text-sm font-medium text-gray-700">
+									<label for="" class="mb-2 block text-sm font-medium text-gray-700">
 										Pages (e.g. 1-5,8,10-12)
 									</label>
 									<input
@@ -328,7 +328,7 @@
 				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
 					<div class="flex justify-center">
 						<button
-							on:click={splitPDF}
+							onclick={splitPDF}
 							disabled={!splitPdfDoc ||
 								isSplitting ||
 								(splitMode === 'range' && !rangeInput.trim())}
@@ -361,6 +361,7 @@
 			<span class="text-gray-400">•</span>
 			<a
 				href="https://github.com/Lequanghy/pdf-utility"
+				aria-label="Github"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="group inline-flex items-center gap-2 text-gray-600 transition hover:text-indigo-600"
