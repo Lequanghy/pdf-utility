@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { PDFDocument } from 'pdf-lib';
+	import Dropzone from 'svelte-file-dropzone';
+	import type FileRejection from 'svelte-file-dropzone';
 
 	// Shared state
 	let mode: 'merge' | 'split' = $state('merge');
@@ -17,6 +19,10 @@
 	let rangeInput = $state(''); // e.g. "1-5,8,10-12"
 	let splitStatus = $state('');
 	let isSplitting = $state(false);
+
+	// Drop state
+	let mergeDropStatus = $state('');
+	let splitDropStatus = $state('');
 
 	// ─── Helpers ────────────────────────────────────────
 	function handleMergeFiles(selected: FileList | null | undefined) {
@@ -146,6 +152,57 @@
 		a.click();
 		URL.revokeObjectURL(url);
 	}
+
+	// ─── Drop logic ────────────────────────────────────
+	function onMergeDrop(e: CustomEvent<{ acceptedFiles: File[]; fileRejections: FileRejection[] }>) {
+		const { acceptedFiles, fileRejections } = e.detail;
+
+		if (fileRejections.length > 0) {
+			mergeDropStatus = `Rejected: ${fileRejections.map((r) => r.file.name + ' - ' + r.errors[0].message).join(', ')}`;
+			mergeDropStatus = mergeDropStatus + 'Split mode: only one PDF allowed';
+			return;
+		}
+
+		if (mode === 'split' && acceptedFiles.length > 1) {
+			mergeDropStatus = 'Split mode: only one PDF allowed';
+			return;
+		}
+
+		acceptedFiles.forEach(async (file) => {
+			if (mode === 'merge') {
+				mergeFiles = [...mergeFiles, file];
+			} else {
+				splitFile = file;
+			}
+		});
+
+		mergeDropStatus = `Added ${acceptedFiles.length} PDF${acceptedFiles.length !== 1 ? 's' : ''}`;
+	}
+
+	function onSplitDrop(e: CustomEvent<{ acceptedFiles: File[]; fileRejections: FileRejection[] }>) {
+		const { acceptedFiles, fileRejections } = e.detail;
+
+		if (fileRejections.length > 0) {
+			splitDropStatus = `Rejected: ${fileRejections.map((r) => r.file.name + ' - ' + r.errors[0].message).join(', ')}`;
+			splitDropStatus = splitDropStatus + 'Split mode: only one PDF allowed';
+			return;
+		}
+
+		if (mode === 'split' && acceptedFiles.length > 1) {
+			splitDropStatus = 'Split mode: only one PDF allowed';
+			return;
+		}
+
+		acceptedFiles.forEach(async (file) => {
+			if (mode === 'merge') {
+				mergeFiles = [...mergeFiles, file];
+			} else {
+				splitFile = file;
+			}
+		});
+
+		splitDropStatus = `Added ${acceptedFiles.length} PDF${acceptedFiles.length !== 1 ? 's' : ''}`;
+	}
 </script>
 
 <main class="flex min-h-screen flex-col bg-gray-50">
@@ -174,12 +231,49 @@
 			</div>
 
 			<!-- Merge Content -->
+
 			{#if mode === 'merge'}
 				<div class="px-8 pt-8">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs</h2>
 					<p class="mb-6 text-gray-600">Combine multiple PDFs into one</p>
+					<Dropzone
+						on:drop={onMergeDrop}
+						accept="application/pdf"
+						multiple={mode === 'merge'}
+						class=""
+					>
+						<div
+							class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+						>
+							<svg
+								class="mx-auto mb-4 h-16 w-16 text-blue-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="1.5"
+									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+								/>
+							</svg>
+							<p class="text-xl font-medium text-gray-800">Drop PDFs here or click to select</p>
+						</div>
+					</Dropzone>
 
-					<label
+					{#if mergeDropStatus}
+						<p
+							class="mt-4 text-center text-sm {mergeDropStatus.includes('Rejected') ||
+							mergeDropStatus.includes('only one')
+								? 'text-red-600'
+								: 'text-emerald-600'}"
+						>
+							{mergeDropStatus}
+						</p>
+					{/if}
+
+					<!-- <label
 						for="merge-upload"
 						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
 					>
@@ -205,7 +299,7 @@
 							/>
 						</svg>
 						<p class="text-xl font-medium text-gray-800">Drop PDFs here or click to select</p>
-					</label>
+					</label> -->
 
 					{#if mergeFiles.length > 0}
 						<div class="mt-8 space-y-3">
@@ -239,7 +333,7 @@
 							disabled={mergeFiles.length === 0 || isMerging}
 							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isMerging || mergeFiles.length === 0
-								? 'cursor-not-allowed bg-gray-500'
+								? 'bg-primary cursor-not-allowed'
 								: 'bg-gray-500 hover:bg-gray-900'}"
 						>
 							{isMerging
@@ -259,6 +353,37 @@
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
 					<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
 
+					<Dropzone on:drop={onSplitDrop} accept="application/pdf" multiple={false} class="">
+						<div
+							class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+						>
+							<svg
+								class="mx-auto mb-4 h-16 w-16 text-blue-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="1.5"
+									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+								/>
+							</svg>
+							<p class="text-xl font-medium text-gray-800">Drop PDFs here or click to select</p>
+						</div>
+					</Dropzone>
+					{#if splitDropStatus}
+						<p
+							class="mt-4 text-center text-sm {splitDropStatus.includes('Rejected') ||
+							splitDropStatus.includes('only one')
+								? 'text-red-600'
+								: 'text-emerald-600'}"
+						>
+							{splitDropStatus}
+						</p>
+					{/if}
+					<!-- 
 					<label
 						for="split-upload"
 						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
@@ -284,7 +409,7 @@
 							/>
 						</svg>
 						<p class="text-xl font-medium text-gray-800">Drop your PDF here or click to select</p>
-					</label>
+					</label> -->
 
 					{#if splitFile}
 						<div class="mt-6 rounded-lg bg-gray-50 p-5">
@@ -334,7 +459,7 @@
 								(splitMode === 'range' && !rangeInput.trim())}
 							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isSplitting || !splitPdfDoc
-								? 'cursor-not-allowed bg-gray-400'
+								? 'bg-primary cursor-not-allowed'
 								: 'bg-gray-500 hover:bg-gray-900'}"
 						>
 							{isSplitting
