@@ -10,12 +10,12 @@ const adapter =
 const config = {
 	preprocess: vitePreprocess(),
 	kit: {
-		adapter: adapter({
-			out: 'build', // default
-			precompress: false,
-			envPrefix: 'SVELTE_',
-			polyfills: true
-		})
+		// adapter: adapter({
+		// 	out: 'build', // default
+		// 	precompress: false,
+		// 	envPrefix: 'SVELTE_',
+		// 	polyfills: true
+		// })
 	}
 };
 
