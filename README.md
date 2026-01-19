@@ -1,39 +1,51 @@
-# sv
+# PDF Tool Box
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A PDF utility built with **SvelteKit** + **Tailwind CSS**.
 
-## Creating a project
+Merge multiple PDFs and Split PDFs into single pages or custom ranges
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project in the current directory
-npx sv create
+- **Merge PDFs** — combine multiple PDF files into one
+- **Split PDF** — extract all pages as separate files or select custom page ranges
+- **Drag & drop** file upload with visual feedback
+- **Fully client-side** — uses pdf-lib and pdf.js, no backend required
+- **Responsive design** — works on desktop and mobile
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Demo
 
-## Developing
+Live version: [https://pdf-utility-9tma.onrender.com/](https://pdf-utility-9tma.onrender.com/)
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Tech Stack
 
-```sh
-npm run dev
+- **Framework**: SvelteKit
+- **Styling**: Tailwind CSS
+- **PDF processing**: [pdf-lib](https://pdf-lib.js.org/)
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Getting Started
 
-## Building
+### Prerequisites
 
-To create a production version of your app:
+- Node.js ≥ 18 (preferably 20 or 22 LTS)
+- npm, pnpm or yarn
 
-```sh
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Lequanghy/pdf-utility
+cd pdf-tool-box
+
+# Install dependencies
+npm install
+# or
+pnpm install
+# or
+yarn install
+
+# Build
 npm run build
+
+# Run Project
+npm start
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-# pdf-utility

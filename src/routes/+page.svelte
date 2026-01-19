@@ -216,253 +216,262 @@
 	}
 </script>
 
-<main class="flex min-h-screen flex-col bg-gray-50">
-	<div class="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-		<div class="w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
-			<!-- Mode Tabs -->
-			<div class="flex border-b border-gray-200">
-				<button
-					onclick={() => (mode = 'merge')}
-					class="flex-1 py-5 text-center font-medium transition-colors
-                 {mode === 'merge'
-						? 'border-primary text-primary border-b-4'
-						: 'text-gray-600 hover:text-gray-900'}"
-				>
-					Merge
-				</button>
-				<button
-					onclick={() => (mode = 'split')}
-					class="flex-1 py-5 text-center font-medium transition-colors
-                 {mode === 'split'
-						? 'border-primary text-primary border-b-4'
-						: 'text-gray-600 hover:text-gray-900'}"
-				>
-					Split
-				</button>
+<main class=" flex flex-col bg-gray-50">
+	<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+		<header class=" mb-5 rounded-2xl py-8 text-gray-600 shadow-lg">
+			<div class="mx-auto max-w-5xl px-4 text-center">
+				<h1 class="text-4xl font-bold tracking-tight md:text-5xl">PDF Tool Box</h1>
 			</div>
-
-			<!-- Merge Content -->
-
-			{#if mode === 'merge'}
-				<div class="px-8 pt-8">
-					<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs</h2>
-					<p class="mb-6 text-gray-600">Combine multiple PDFs into one</p>
-					<label
-						for="file-input"
-						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-						class:border-green-500={dragging}
-						class:bg-green-50={dragging}
-						class:border-blue-400={!dragging}
-						class:bg-blue-50={!dragging}
-						class:hover:border-blue-500={!dragging}
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleDrop}
+		</header>
+		<div class="flex items-center justify-center">
+			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
+				<!-- Mode Tabs -->
+				<div class="flex border-b border-gray-200">
+					<button
+						onclick={() => (mode = 'merge')}
+						class="flex-1 py-5 text-center font-medium transition-colors
+                 {mode === 'merge'
+							? 'border-primary text-primary border-b-4'
+							: 'text-gray-600 hover:text-gray-900'}"
 					>
-						<input
-							id="file-input"
-							type="file"
-							accept="application/pdf"
-							multiple
-							class="hidden"
-							onchange={(e) => handleMergeFiles(e.currentTarget.files)}
-						/>
-						<svg
-							class="mx-auto mb-4 h-16 w-16 text-blue-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
+						Merge
+					</button>
+					<button
+						onclick={() => (mode = 'split')}
+						class="flex-1 py-5 text-center font-medium transition-colors
+                 {mode === 'split'
+							? 'border-primary text-primary border-b-4'
+							: 'text-gray-600 hover:text-gray-900'}"
+					>
+						Split
+					</button>
+				</div>
+
+				<!-- Merge Content -->
+
+				{#if mode === 'merge'}
+					<div class="px-8 pt-8">
+						<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs</h2>
+						<p class="mb-6 text-gray-600">Combine multiple PDFs into one</p>
+						<label
+							for="file-input"
+							class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+							class:border-green-500={dragging}
+							class:bg-green-50={dragging}
+							class:border-blue-400={!dragging}
+							class:bg-blue-50={!dragging}
+							class:hover:border-blue-500={!dragging}
+							ondragover={handleDragOver}
+							ondragleave={handleDragLeave}
+							ondrop={handleDrop}
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+							<input
+								id="file-input"
+								type="file"
+								accept="application/pdf"
+								multiple
+								class="hidden"
+								onchange={(e) => handleMergeFiles(e.currentTarget.files)}
 							/>
-						</svg>
-						{#if dragging}
-							<p class="text-xl font-medium text-green-700">Drop here to upload</p>
-						{:else}
-							<p class="text-xl font-medium text-gray-800">Drop PDF files here</p>
-							<p class="mt-2 text-gray-600">or click to select</p>
+							<svg
+								class="mx-auto mb-4 h-16 w-16 text-blue-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="1.5"
+									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+								/>
+							</svg>
+							{#if dragging}
+								<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+							{:else}
+								<p class="text-xl font-medium text-gray-800">Drop PDF files here</p>
+								<p class="mt-2 text-gray-600">or click to select</p>
+							{/if}
+						</label>
+
+						{#if mergeDropStatus}
+							<p
+								class="mt-4 text-center text-sm {mergeDropStatus.includes('Please')
+									? 'text-red-600'
+									: 'text-green-600'}"
+							>
+								{mergeDropStatus}
+							</p>
 						{/if}
-					</label>
 
-					{#if mergeDropStatus}
-						<p
-							class="mt-4 text-center text-sm {mergeDropStatus.includes('Please')
-								? 'text-red-600'
-								: 'text-green-600'}"
-						>
-							{mergeDropStatus}
-						</p>
-					{/if}
-
-					{#if mergeFiles.length > 0}
-						<div class="mt-8 space-y-3">
-							{#each mergeFiles as file, i (file.name + i)}
-								<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
-									<div class="flex min-w-0 flex-1 items-center gap-3">
-										<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-											<path
-												d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"
-											/>
-										</svg>
-										<div class="min-w-0 flex-1">
-											<p class="truncate font-medium">{file.name}</p>
-											<p class="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+						{#if mergeFiles.length > 0}
+							<div class="mt-8 space-y-3">
+								{#each mergeFiles as file, i (file.name + i)}
+									<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
+										<div class="flex min-w-0 flex-1 items-center gap-3">
+											<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+												<path
+													d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"
+												/>
+											</svg>
+											<div class="min-w-0 flex-1">
+												<p class="truncate font-medium">{file.name}</p>
+												<p class="text-sm text-gray-500">
+													{(file.size / 1024 / 1024).toFixed(1)} MB
+												</p>
+											</div>
 										</div>
+										<button
+											onclick={() => removeMergeFile(i)}
+											class="ml-4 text-red-600 hover:text-red-800">Remove</button
+										>
 									</div>
-									<button
-										onclick={() => removeMergeFile(i)}
-										class="ml-4 text-red-600 hover:text-red-800">Remove</button
-									>
-								</div>
-							{/each}
-						</div>
-					{/if}
-				</div>
-
-				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
-					<div class="flex justify-center">
-						<button
-							onclick={mergePDFs}
-							disabled={mergeFiles.length === 0 || isMerging}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isMerging || mergeFiles.length === 0
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-gray-500 hover:bg-gray-900'}"
-						>
-							{isMerging
-								? 'Merging…'
-								: `Merge ${mergeFiles.length || ''} PDF${mergeFiles.length !== 1 ? 's' : ''}`}
-						</button>
-					</div>
-					{#if mergeStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700">{mergeStatus}</p>
-					{/if}
-				</div>
-			{/if}
-
-			<!-- Split Content -->
-			{#if mode === 'split'}
-				<div class="px-8 pt-8">
-					<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
-					<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
-
-					<label
-						for="file-input"
-						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-						class:border-green-500={dragging}
-						class:bg-green-50={dragging}
-						class:border-blue-400={!dragging}
-						class:bg-blue-50={!dragging}
-						class:hover:border-blue-500={!dragging}
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleDrop}
-					>
-						<input
-							id="file-input"
-							type="file"
-							accept="application/pdf"
-							class="hidden"
-							onchange={(e) => handleSplitFile(e.currentTarget.files)}
-						/>
-						<svg
-							class="mx-auto mb-4 h-16 w-16 text-blue-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-							/>
-						</svg>
-						{#if dragging}
-							<p class="text-xl font-medium text-green-700">Drop here to upload</p>
-						{:else}
-							<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
-							<p class="mt-2 text-gray-600">or click to select</p>
+								{/each}
+							</div>
 						{/if}
-					</label>
+					</div>
 
-					{#if splitDropStatus}
-						<p
-							class="mt-4 text-center text-sm {splitDropStatus.includes('allowed')
-								? 'text-red-600'
-								: 'text-green-600'}"
-						>
-							{splitDropStatus}
-						</p>
-					{/if}
-
-					{#if splitFile}
-						<div class="mt-6 rounded-lg bg-gray-50 p-5">
-							<p class="font-medium">Selected: {splitFile.name}</p>
-							<p class="text-sm text-gray-600">Pages: {totalPages}</p>
+					<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
+						<div class="flex justify-center">
+							<button
+								onclick={mergePDFs}
+								disabled={mergeFiles.length === 0 || isMerging}
+								class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
+                     {isMerging || mergeFiles.length === 0
+									? 'bg-primary cursor-not-allowed'
+									: 'bg-gray-500 hover:bg-gray-900'}"
+							>
+								{isMerging
+									? 'Merging…'
+									: `Merge ${mergeFiles.length || ''} PDF${mergeFiles.length !== 1 ? 's' : ''}`}
+							</button>
 						</div>
+						{#if mergeStatus}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{mergeStatus}</p>
+						{/if}
+					</div>
+				{/if}
 
-						<div class="mt-8">
-							<div class="mb-4 flex gap-6">
-								<label class="flex cursor-pointer items-center gap-2">
-									<input type="radio" bind:group={splitMode} value="per-page" />
-									One PDF per page
-								</label>
-								<label class="flex cursor-pointer items-center gap-2">
-									<input type="radio" bind:group={splitMode} value="range" />
-									Custom page range
-								</label>
+				<!-- Split Content -->
+				{#if mode === 'split'}
+					<div class="px-8 pt-8">
+						<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
+						<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
+
+						<label
+							for="file-input"
+							class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+							class:border-green-500={dragging}
+							class:bg-green-50={dragging}
+							class:border-blue-400={!dragging}
+							class:bg-blue-50={!dragging}
+							class:hover:border-blue-500={!dragging}
+							ondragover={handleDragOver}
+							ondragleave={handleDragLeave}
+							ondrop={handleDrop}
+						>
+							<input
+								id="file-input"
+								type="file"
+								accept="application/pdf"
+								class="hidden"
+								onchange={(e) => handleSplitFile(e.currentTarget.files)}
+							/>
+							<svg
+								class="mx-auto mb-4 h-16 w-16 text-blue-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="1.5"
+									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+								/>
+							</svg>
+							{#if dragging}
+								<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+							{:else}
+								<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
+								<p class="mt-2 text-gray-600">or click to select</p>
+							{/if}
+						</label>
+
+						{#if splitDropStatus}
+							<p
+								class="mt-4 text-center text-sm {splitDropStatus.includes('allowed')
+									? 'text-red-600'
+									: 'text-green-600'}"
+							>
+								{splitDropStatus}
+							</p>
+						{/if}
+
+						{#if splitFile}
+							<div class="mt-6 rounded-lg bg-gray-50 p-5">
+								<p class="font-medium">Selected: {splitFile.name}</p>
+								<p class="text-sm text-gray-600">Pages: {totalPages}</p>
 							</div>
 
-							{#if splitMode === 'range'}
-								<div class="mt-4">
-									<label for="" class="mb-2 block text-sm font-medium text-gray-700">
-										Pages (e.g. 1-5,8,10-12)
+							<div class="mt-8">
+								<div class="mb-4 flex gap-6">
+									<label class="flex cursor-pointer items-center gap-2">
+										<input type="radio" bind:group={splitMode} value="per-page" />
+										One PDF per page
 									</label>
-									<input
-										type="text"
-										bind:value={rangeInput}
-										placeholder="1-5,8,10-12"
-										class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3"
-										disabled={isSplitting}
-									/>
-									<p class="mt-2 text-sm text-gray-500">
-										Use commas to separate, hyphen for ranges. 1-based indexing.
-									</p>
+									<label class="flex cursor-pointer items-center gap-2">
+										<input type="radio" bind:group={splitMode} value="range" />
+										Custom page range
+									</label>
 								</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
 
-				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
-					<div class="flex justify-center">
-						<button
-							onclick={splitPDF}
-							disabled={!splitPdfDoc ||
-								isSplitting ||
-								(splitMode === 'range' && !rangeInput.trim())}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isSplitting || !splitPdfDoc
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-gray-500 hover:bg-gray-900'}"
-						>
-							{isSplitting
-								? 'Splitting…'
-								: splitMode === 'per-page'
-									? 'Split into single pages'
-									: 'Extract pages'}
-						</button>
+								{#if splitMode === 'range'}
+									<div class="mt-4">
+										<label for="" class="mb-2 block text-sm font-medium text-gray-700">
+											Pages (e.g. 1-5,8,10-12)
+										</label>
+										<input
+											type="text"
+											bind:value={rangeInput}
+											placeholder="1-5,8,10-12"
+											class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3"
+											disabled={isSplitting}
+										/>
+										<p class="mt-2 text-sm text-gray-500">
+											Use commas to separate, hyphen for ranges. 1-based indexing.
+										</p>
+									</div>
+								{/if}
+							</div>
+						{/if}
 					</div>
-					{#if splitStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
-					{/if}
-				</div>
-			{/if}
+
+					<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
+						<div class="flex justify-center">
+							<button
+								onclick={splitPDF}
+								disabled={!splitPdfDoc ||
+									isSplitting ||
+									(splitMode === 'range' && !rangeInput.trim())}
+								class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
+                     {isSplitting || !splitPdfDoc
+									? 'bg-primary cursor-not-allowed'
+									: 'bg-gray-500 hover:bg-gray-900'}"
+							>
+								{isSplitting
+									? 'Splitting…'
+									: splitMode === 'per-page'
+										? 'Split into single pages'
+										: 'Extract pages'}
+							</button>
+						</div>
+						{#if splitStatus}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
+						{/if}
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 
