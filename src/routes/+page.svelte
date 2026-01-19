@@ -8,6 +8,7 @@
 	let mergeFiles: File[] = $state([]);
 	let mergeStatus = $state('');
 	let isMerging = $state(false);
+	let mergePdfDoc: PDFDocument | null = $state(null);
 
 	// Split state
 	let splitFile: File | null = $state(null);
@@ -25,11 +26,32 @@
 	let status = $state('');
 
 	// ─── Helpers ────────────────────────────────────────
-	function handleMergeFiles(selected: FileList | null | undefined) {
+	async function handleMergeFiles(selected: FileList | null | undefined) {
 		if (!selected) return;
 		const pdfs = Array.from(selected).filter((f) => f.type === 'application/pdf');
 		mergeFiles = [...mergeFiles, ...pdfs];
-		mergeStatus = '';
+		mergeStatus = 'Loading PDF...';
+
+		if (!mergeFiles || mergeFiles.length === 0) return;
+		for (let i = 0; i < mergeFiles.length; i++) {
+			console.log(i);
+			const file = selected[0];
+			if (file.type !== 'application/pdf') {
+				mergeStatus = 'Please select a PDF file';
+				return;
+			}
+			try {
+				const buf = await file.arrayBuffer();
+				mergePdfDoc = await PDFDocument.load(buf);
+				totalPages = mergePdfDoc.getPageCount();
+			} catch (err) {
+				splitStatus = `Error loading PDF: ${err instanceof Error ? err.message : 'Invalid file'}`;
+				splitFile = null;
+				splitPdfDoc = null;
+				totalPages = 0;
+			}
+		}
+		mergeStatus = `${mergeFiles.length} PDF${mergeFiles.length === 1 ? '' : 's'} Loaded `;
 	}
 
 	function removeMergeFile(index: number) {
@@ -67,9 +89,9 @@
 			splitStatus = 'Please select a PDF file';
 			return;
 		}
-
 		splitFile = file;
 		splitStatus = 'Loading PDF...';
+
 		try {
 			const buf = await file.arrayBuffer();
 			splitPdfDoc = await PDFDocument.load(buf);
@@ -172,15 +194,16 @@
 			return;
 		}
 
-		pdfs.forEach(async (file) => {
-			if (mode === 'merge') {
-				mergeFiles = [...mergeFiles, file];
-				mergeDropStatus = `Added ${pdfs.length} PDF file${pdfs.length === 1 ? '' : 's'}`;
-			} else {
+		if (mode === 'merge') {
+			mergeDropStatus = '';
+			handleMergeFiles(droppedFiles);
+		} else {
+			pdfs.forEach(async (file) => {
 				splitFile = file;
-				splitDropStatus = `Added ${pdfs.length} PDF file${pdfs.length === 1 ? '' : 's'}`;
-			}
-		});
+				splitDropStatus = '';
+				handleSplitFile(droppedFiles);
+			});
+		}
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -369,7 +392,7 @@
 
 					{#if splitDropStatus}
 						<p
-							class="mt-4 text-center text-sm {splitDropStatus.includes('Please')
+							class="mt-4 text-center text-sm {splitDropStatus.includes('allowed')
 								? 'text-red-600'
 								: 'text-green-600'}"
 						>
