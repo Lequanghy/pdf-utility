@@ -18,7 +18,7 @@
 
 <header class="flex items-center justify-between">
 	<h1 class=" mb-5 rounded-2xl py-8 text-gray-600">
-		<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/merge">PDF Tool Box</a>
+		<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/">PDF Tool Box</a>
 	</h1>
 	<nav class="bg-primary">
 		<div class="mx-auto max-w-6xl px-4">
