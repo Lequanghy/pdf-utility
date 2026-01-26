@@ -131,13 +131,11 @@
 			return;
 		}
 
-		if (mode === 'split') {
-			pdfs.forEach(async (file) => {
-				splitFile = file;
-				splitDropStatus = '';
-				handleSplitFile(droppedFiles);
-			});
-		}
+		pdfs.forEach(async (file) => {
+			splitFile = file;
+			splitDropStatus = '';
+			handleSplitFile(droppedFiles);
+		});
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -155,7 +153,7 @@
 		<div class="flex items-center justify-center">
 			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
 				<!-- Split Content -->
-				<div class="px-8 pt-8">
+				<div class="px-8 py-10">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
 					<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
 
@@ -210,7 +208,7 @@
 					{/if}
 
 					{#if splitFile}
-						<div class="mt-6 rounded-lg bg-gray-50 p-5">
+						<div class="mt-6 rounded-lg bg-gray-100 p-5">
 							<p class="font-medium">Selected: {splitFile.name}</p>
 							<p class="text-sm text-gray-600">Pages: {totalPages}</p>
 						</div>
@@ -247,30 +245,31 @@
 						</div>
 					{/if}
 				</div>
-
-				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
-					<div class="flex justify-center">
-						<button
-							onclick={splitPDF}
-							disabled={!splitPdfDoc ||
-								isSplitting ||
-								(splitMode === 'range' && !rangeInput.trim())}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
+				{#if splitPdfDoc}
+					<div class=" bg-white px-8 pb-10">
+						<div class="flex justify-center">
+							<button
+								onclick={splitPDF}
+								disabled={!splitPdfDoc ||
+									isSplitting ||
+									(splitMode === 'range' && !rangeInput.trim())}
+								class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isSplitting || !splitPdfDoc
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-gray-500 hover:bg-gray-900'}"
-						>
-							{isSplitting
-								? 'Splitting…'
-								: splitMode === 'per-page'
-									? 'Split into single pages'
-									: 'Extract pages'}
-						</button>
+									? 'bg-primary cursor-not-allowed'
+									: 'bg-green-600 hover:bg-green-700'}"
+							>
+								{isSplitting
+									? 'Splitting…'
+									: splitMode === 'per-page'
+										? 'Split into single pages'
+										: 'Extract pages'}
+							</button>
+						</div>
+						{#if splitStatus}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
+						{/if}
 					</div>
-					{#if splitStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
-					{/if}
-				</div>
+				{/if}
 			</div>
 		</div>
 	</div>

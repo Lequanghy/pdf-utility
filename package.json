@@ -47,6 +47,7 @@
 		"@quicktoolsone/pdf-compress": "^2.0.0",
 		"@sveltejs/adapter-static": "^3.0.10",
 		"pdf-lib": "^1.17.1",
+		"pdfjs-dist": "^5.4.530",
 		"svelte-file-dropzone": "^2.0.9"
 	}
 }
