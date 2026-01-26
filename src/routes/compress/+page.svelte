@@ -1,185 +1,15 @@
 <script lang="ts">
-	import { PDFDocument } from 'pdf-lib';
-	import { compressBalanced } from '@quicktoolsone/pdf-compress';
-
-	// Shared state
-	let mode: 'merge' | 'split' | 'compress' = $state('merge');
-
-	// Merge state
-	let mergeFiles: File[] = $state([]);
-	let mergeStatus = $state('');
-	let isMerging = $state(false);
-	let mergePdfDoc: PDFDocument | null = $state(null);
-
-	// Split state
-	let splitFile: File | null = $state(null);
-	let splitPdfDoc: PDFDocument | null = $state(null);
-	let totalPages = $state(0);
-	let splitMode: 'per-page' | 'range' = $state('per-page');
-	let rangeInput = $state(''); // e.g. "1-5,8,10-12"
-	let splitStatus = $state('');
-	let isSplitting = $state(false);
+	import { PDFDocument, StandardFonts } from 'pdf-lib';
+	import * as pdfjs from 'pdfjs-dist';
+	pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 	// Compress state
 	let compressStatus = $state('');
 	let compressFile: File | null = $state(null);
 
 	// Drop state
-	let mergeDropStatus = $state('');
-	let splitDropStatus = $state('');
 	let compressDropStatus = $state('');
 	let dragging = $state(false);
-	let status = $state('');
-
-	// ─── Helpers ────────────────────────────────────────
-	async function handleMergeFiles(selected: FileList | null | undefined) {
-		if (!selected) return;
-		const pdfs = Array.from(selected).filter((f) => f.type === 'application/pdf');
-		mergeFiles = [...mergeFiles, ...pdfs];
-		mergeStatus = 'Loading PDF...';
-
-		if (!mergeFiles || mergeFiles.length === 0) return;
-		for (let i = 0; i < mergeFiles.length; i++) {
-			console.log(i);
-			const file = selected[0];
-			if (file.type !== 'application/pdf') {
-				mergeStatus = 'Please select a PDF file';
-				return;
-			}
-			try {
-				const buf = await file.arrayBuffer();
-				mergePdfDoc = await PDFDocument.load(buf);
-				totalPages = mergePdfDoc.getPageCount();
-			} catch (err) {
-				splitStatus = `Error loading PDF: ${err instanceof Error ? err.message : 'Invalid file'}`;
-				splitFile = null;
-				splitPdfDoc = null;
-				totalPages = 0;
-			}
-		}
-		mergeStatus = `${mergeFiles.length} PDF${mergeFiles.length === 1 ? '' : 's'} Loaded `;
-	}
-
-	function removeMergeFile(index: number) {
-		mergeFiles = mergeFiles.filter((_, i) => i !== index);
-	}
-
-	async function mergePDFs() {
-		if (mergeFiles.length === 0) return;
-		isMerging = true;
-		mergeStatus = 'Merging PDFs... please wait';
-
-		try {
-			const merged = await PDFDocument.create();
-			for (const file of mergeFiles) {
-				const buf = await file.arrayBuffer();
-				const src = await PDFDocument.load(buf);
-				const pages = await merged.copyPages(src, src.getPageIndices());
-				pages.forEach((p) => merged.addPage(p));
-			}
-			const bytes = await merged.save();
-			download(bytes, `merged_${dateStr()}.pdf`);
-			mergeStatus = `Success! Merged ${mergeFiles.length} file${mergeFiles.length === 1 ? '' : 's'}`;
-		} catch (err) {
-			mergeStatus = `Error: ${err instanceof Error ? err.message : 'Failed'}`;
-		} finally {
-			isMerging = false;
-		}
-	}
-
-	// ─── Split logic ────────────────────────────────────
-	async function handleSplitFile(selected: FileList | null | undefined) {
-		if (!selected || selected.length === 0) return;
-		const file = selected[0];
-		if (file.type !== 'application/pdf') {
-			splitStatus = 'Please select a PDF file';
-			return;
-		}
-		splitFile = file;
-		splitStatus = 'Loading PDF...';
-
-		try {
-			const buf = await file.arrayBuffer();
-			splitPdfDoc = await PDFDocument.load(buf);
-			totalPages = splitPdfDoc.getPageCount();
-			splitStatus = `PDF loaded — ${totalPages} page${totalPages === 1 ? '' : 's'}`;
-		} catch (err) {
-			splitStatus = `Error loading PDF: ${err instanceof Error ? err.message : 'Invalid file'}`;
-			splitFile = null;
-			splitPdfDoc = null;
-			totalPages = 0;
-		}
-	}
-
-	async function splitPDF() {
-		if (!splitPdfDoc || totalPages === 0) return;
-		isSplitting = true;
-		splitStatus = 'Splitting... please wait';
-
-		try {
-			if (splitMode === 'per-page') {
-				for (let i = 0; i < totalPages; i++) {
-					const newDoc = await PDFDocument.create();
-					const [page] = await newDoc.copyPages(splitPdfDoc, [i]);
-					newDoc.addPage(page);
-					const bytes = await newDoc.save();
-					download(bytes, `page_${i + 1}_of_${totalPages}_${dateStr()}.pdf`);
-				}
-				splitStatus = `Success! Downloaded ${totalPages} single-page PDF${totalPages === 1 ? '' : 's'}`;
-			} else {
-				// Range mode
-				const pagesToExtract = parsePageRange(rangeInput, totalPages);
-				if (pagesToExtract.length === 0) throw new Error('No valid pages selected');
-
-				const newDoc = await PDFDocument.create();
-				const copied = await newDoc.copyPages(splitPdfDoc, pagesToExtract);
-				copied.forEach((p) => newDoc.addPage(p));
-
-				const bytes = await newDoc.save();
-				download(bytes, `extracted_${pagesToExtract.length}_pages_${dateStr()}.pdf`);
-				splitStatus = `Success! Extracted ${pagesToExtract.length} page${pagesToExtract.length === 1 ? '' : 's'}`;
-			}
-		} catch (err) {
-			splitStatus = `Error: ${err instanceof Error ? err.message : 'Failed to split'}`;
-		} finally {
-			isSplitting = false;
-		}
-	}
-
-	function parsePageRange(input: string, max: number): number[] {
-		const result = new Set<number>();
-		const parts = input
-			.split(',')
-			.map((p) => p.trim())
-			.filter(Boolean);
-
-		for (const part of parts) {
-			if (/^\d+$/.test(part)) {
-				const n = Number(part);
-				if (n >= 1 && n <= max) result.add(n - 1); // 0-based for pdf-lib
-			} else if (/^\d+-\d+$/.test(part)) {
-				const [start, end] = part.split('-').map(Number);
-				if (start >= 1 && end <= max && start <= end) {
-					for (let i = start; i <= end; i++) result.add(i - 1);
-				}
-			}
-		}
-		return Array.from(result).sort((a, b) => a - b);
-	}
-
-	function dateStr() {
-		return new Date().toISOString().slice(0, 10);
-	}
-
-	function download(bytes: Uint8Array, filename: string) {
-		const blob = new Blob([new Uint8Array(bytes)], { type: 'application/pdf' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = filename;
-		a.click();
-		URL.revokeObjectURL(url);
-	}
 
 	// ─── Drop logic ────────────────────────────────────
 	function handleDrop(e: DragEvent) {
@@ -192,24 +22,18 @@
 		const pdfs = Array.from(droppedFiles).filter((f) => f.type === 'application/pdf');
 
 		if (pdfs.length === 0) {
-			mergeDropStatus = 'Please drop PDF files only';
+			compressDropStatus = 'Please drop PDF files only';
 			return;
 		}
-		if (mode === 'split' && droppedFiles.length > 1) {
-			splitDropStatus = 'Split mode: only one PDF allowed';
+		if (droppedFiles.length > 1) {
+			compressDropStatus = 'Compress mode: only one PDF allowed';
 			return;
 		}
-
-		if (mode === 'merge') {
-			mergeDropStatus = '';
-			handleMergeFiles(droppedFiles);
-		} else {
-			pdfs.forEach(async (file) => {
-				splitFile = file;
-				splitDropStatus = '';
-				handleSplitFile(droppedFiles);
-			});
-		}
+		pdfs.forEach(async (file) => {
+			compressFile = file;
+			compressDropStatus = 'Succesfully upload the PDF file';
+			handleCompressFile(droppedFiles);
+		});
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -228,7 +52,10 @@
 	let compressedSize = $state(0);
 	let isCompressing = $state(false);
 	let progress = $state(0);
-	compressStatus = 'complete';
+	let maxDimension: number; // max width/height for images (default: 1200)
+	let jpegQuality: number; // 0.1–1.0 (default: 0.75)
+	let scaleFactor: number; // overall page scale (default: 0.75)
+
 	// Handle drop/select for compress mode
 	async function handleCompressFile(selected: FileList | null | undefined) {
 		if (!selected || selected.length === 0) return;
@@ -237,41 +64,83 @@
 			compressStatus = 'Please select a PDF file';
 			return;
 		}
-
+		console.log(selected);
 		compressFile = file;
 		originalSize = file.size;
 		compressedBlob = null;
 		compressedSize = 0;
 		progress = 0;
 		isCompressing = true;
-
+		maxDimension = 12000;
+		jpegQuality = 1;
+		scaleFactor = 1;
 		try {
-			const buffer = await file.arrayBuffer();
-			const result = await compressBalanced(buffer);
-			compressedBlob = new Blob([result.pdf], { type: 'application/pdf' });
+			const arrayBuffer = await file.arrayBuffer();
+			const originalPdf = await PDFDocument.load(arrayBuffer);
+			const pageCount = originalPdf.getPageCount();
+			let tempBuffer = null;
+			// // Create brand new PDF document
+			const newPdf = await PDFDocument.create();
+
+			// // Optional: embed a font if needed later (rare in this method)
+			const helvetica = await newPdf.embedFont(StandardFonts.Helvetica);
+
+			// const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+			for (let i = 0; i < pageCount; i++) {
+				// Get original page info
+				tempBuffer = arrayBuffer.slice(0);
+				const originalPage = originalPdf.getPage(i);
+				const { width, height } = originalPage.getSize();
+				// Calculate new dimensions
+				const scale = Math.min(scaleFactor, maxDimension / Math.max(width, height));
+				const newWidth = Math.round(width * scale);
+				const newHeight = Math.round(height * scale);
+				// Render original page to canvas at reduced size
+				const pdf = await pdfjs.getDocument({ data: tempBuffer }).promise;
+				const page = await pdf.getPage(i + 1);
+				const viewport = page.getViewport({ scale });
+				const canvas = document.createElement('canvas');
+				canvas.width = newWidth;
+				canvas.height = newHeight;
+				const ctx = canvas.getContext('2d');
+				if (!ctx) throw new Error('Failed to get canvas context');
+				await page.render({
+					canvasContext: ctx,
+					canvas: canvas,
+					viewport: page.getViewport({ scale })
+				}).promise;
+				// Convert canvas to JPEG blob with quality
+				const jpegBlob = await new Promise<Blob>((resolve) => {
+					canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', jpegQuality);
+				});
+				const jpegBytes = await jpegBlob.arrayBuffer();
+				const jpegImage = await newPdf.embedJpg(jpegBytes);
+				// Add new page with same aspect ratio
+				const newPage = newPdf.addPage([newWidth, newHeight]);
+				// Draw the downsampled image to fill the page
+				newPage.drawImage(jpegImage, {
+					x: 0,
+					y: 0,
+					width: newWidth,
+					height: newHeight
+				});
+			}
+
+			// Final save with compression enabled
+			const bytes = await newPdf.save({
+				useObjectStreams: true
+			});
+
+			compressedBlob = new Blob([bytes], { type: 'application/pdf' });
 			compressedSize = compressedBlob.size;
-			compressStatus = 'complete';
+			compressStatus = `Success! Reduced from ${(originalSize / 1024 / 1024).toFixed(2)} MB → ${(compressedSize / 1024 / 1024).toFixed(2)} MB`;
 		} catch (err) {
-			console.error(err);
-			compressStatus =
-				'Compression failed: ' + (err instanceof Error ? err.message : 'Unknown error');
-		} finally {
-			isCompressing = false;
-		}
-
-		try {
-			// compressedBlob = new Blob([result.pdf], { type: 'application/pdf' });
-			// compressedSize = compressedBlob.size;
-			// compressStatus = 'complete';
-		} catch (err) {
-			console.error(err);
-			compressStatus =
-				'Compression failed: ' + (err instanceof Error ? err.message : 'Unknown error');
+			console.error('Compression failed:', err);
+			compressStatus = 'Failed to compress PDF. ';
 		} finally {
 			isCompressing = false;
 		}
 	}
-
 	function downloadCompressed() {
 		if (!compressedBlob || !compressFile) return;
 
@@ -288,7 +157,7 @@
 	<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
 		<div class="flex items-center justify-center">
 			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
-				<div class="px-8 pt-8">
+				<div class="px-8 py-10">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Compress PDF</h2>
 					<p class="mb-6 text-gray-600">Reduce file size while trying to preserve quality</p>
 					<label
@@ -355,15 +224,11 @@
 										</p>
 									</div>
 								</div>
-								<!-- <button
-										onclick={() => removeCompressFile(i)}
-										class="ml-4 text-red-600 hover:text-red-800">Remove</button
-									> -->
 							</div>
 						</div>
 					{/if}
 					{#if compressFile}
-						<div class="mt-8 rounded-lg bg-gray-50 p-6">
+						<div class="mt-8 rounded-lg bg-white p-6 text-center">
 							{#if compressedBlob}
 								<p class="mt-2 font-medium text-green-700">
 									Compressed: {(compressedSize / 1024 / 1024).toFixed(2)} MB (saved {(
@@ -384,25 +249,6 @@
 								<p class="mt-6 text-center text-sm font-medium text-gray-700">{compressStatus}</p>
 							{/if}
 						</div>
-					{/if}
-				</div>
-				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
-					<div class="flex justify-center">
-						<button
-							onclick={downloadCompressed}
-							disabled={mergeFiles.length === 0 || isMerging}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isMerging || mergeFiles.length === 0
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-gray-500 hover:bg-gray-900'}"
-						>
-							{isMerging
-								? 'Merging…'
-								: `Merge ${mergeFiles.length || ''} PDF${mergeFiles.length !== 1 ? 's' : ''}`}
-						</button>
-					</div>
-					{#if compressStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700">{mergeStatus}</p>
 					{/if}
 				</div>
 			</div>

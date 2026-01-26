@@ -132,7 +132,7 @@
 	<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
 		<div class="flex items-center justify-center">
 			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
-				<div class="px-8 pt-8">
+				<div class="px-8 py-10">
 					<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs</h2>
 					<p class="mb-6 text-gray-600">Combine multiple PDFs into one</p>
 					<label
@@ -212,26 +212,28 @@
 						</div>
 					{/if}
 				</div>
-
-				<div class="mt-8 border-t border-gray-100 bg-gray-50 px-8 py-10">
-					<div class="flex justify-center">
-						<button
-							onclick={mergePDFs}
-							disabled={mergeFiles.length === 0 || isMerging}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
+				{#if mergePdfDoc}
+					<div class=" bg-white px-8 pb-10">
+						<div class="flex justify-center">
+							<button
+								id="mergeBtn"
+								onclick={mergePDFs}
+								disabled={mergeFiles.length === 0 || isMerging}
+								class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
                      {isMerging || mergeFiles.length === 0
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-gray-500 hover:bg-gray-900'}"
-						>
-							{isMerging
-								? 'Merging…'
-								: `Merge ${mergeFiles.length || ''} PDF${mergeFiles.length !== 1 ? 's' : ''}`}
-						</button>
+									? 'bg-primary cursor-not-allowed'
+									: 'bg-green-600 hover:bg-green-700'}"
+							>
+								{isMerging
+									? 'Merging…'
+									: `Merge ${mergeFiles.length || ''} PDF${mergeFiles.length !== 1 ? 's' : ''}`}
+							</button>
+						</div>
+						{#if mergeStatus}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{mergeStatus}</p>
+						{/if}
 					</div>
-					{#if mergeStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700">{mergeStatus}</p>
-					{/if}
-				</div>
+				{/if}
 			</div>
 		</div>
 	</div>
