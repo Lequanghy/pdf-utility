@@ -153,105 +153,103 @@
 	}
 </script>
 
-<main class=" flex flex-col bg-gray-50">
-	<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-		<div class="flex items-center justify-center">
-			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
-				<div class="px-8 py-10">
-					<h2 class="mb-3 text-2xl font-bold text-gray-900">Compress PDF</h2>
-					<p class="mb-6 text-gray-600">Reduce file size while trying to preserve quality</p>
-					<label
-						for="file-input"
-						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-						class:border-green-500={dragging}
-						class:bg-green-50={dragging}
-						class:border-blue-400={!dragging}
-						class:bg-blue-50={!dragging}
-						class:hover:border-blue-500={!dragging}
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleDrop}
+<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+	<div class="flex items-center justify-center">
+		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
+			<div class="px-8 py-10">
+				<h2 class="mb-3 text-2xl font-bold text-gray-900">Compress PDF</h2>
+				<p class="mb-6 text-gray-600">Reduce file size while trying to preserve quality</p>
+				<label
+					for="file-input"
+					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+					class:border-green-500={dragging}
+					class:bg-green-50={dragging}
+					class:border-blue-400={!dragging}
+					class:bg-blue-50={!dragging}
+					class:hover:border-blue-500={!dragging}
+					ondragover={handleDragOver}
+					ondragleave={handleDragLeave}
+					ondrop={handleDrop}
+				>
+					<input
+						id="file-input"
+						type="file"
+						accept="application/pdf"
+						class="hidden"
+						onchange={(e) => handleCompressFile(e.currentTarget.files)}
+					/>
+					<svg
+						class="mx-auto mb-4 h-16 w-16 text-blue-500"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
 					>
-						<input
-							id="file-input"
-							type="file"
-							accept="application/pdf"
-							class="hidden"
-							onchange={(e) => handleCompressFile(e.currentTarget.files)}
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="1.5"
+							d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
 						/>
-						<svg
-							class="mx-auto mb-4 h-16 w-16 text-blue-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-							/>
-						</svg>
-						{#if dragging}
-							<p class="text-xl font-medium text-green-700">Drop here to upload</p>
-						{:else}
-							<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
-							<p class="mt-2 text-gray-600">or click to select</p>
-						{/if}
-					</label>
-					{#if compressDropStatus}
-						<p
-							class="mt-4 text-center text-sm {compressDropStatus.includes('allowed')
-								? 'text-red-600'
-								: 'text-green-600'}"
-						>
-							{compressDropStatus}
-						</p>
+					</svg>
+					{#if dragging}
+						<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+					{:else}
+						<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
+						<p class="mt-2 text-gray-600">or click to select</p>
 					{/if}
-					{#if compressFile}
-						<div class="mt-8 space-y-3">
-							<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
-								<div class="flex min-w-0 flex-1 items-center gap-3">
-									<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-										<path
-											d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"
-										/>
-									</svg>
-									<div class="min-w-0 flex-1">
-										<p class="truncate font-medium">{compressFile.name}</p>
-										<p class="text-sm text-gray-500">
-											{(compressFile.size / 1024 / 1024).toFixed(2)} MB
-										</p>
-									</div>
+				</label>
+				{#if compressDropStatus}
+					<p
+						class="mt-4 text-center text-sm {compressDropStatus.includes('allowed')
+							? 'text-red-600'
+							: 'text-green-600'}"
+					>
+						{compressDropStatus}
+					</p>
+				{/if}
+				{#if compressFile}
+					<div class="mt-8 space-y-3">
+						<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
+							<div class="flex min-w-0 flex-1 items-center gap-3">
+								<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+									<path
+										d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 011 1v9a1 1 0 01-1 1H5a1 1 0 01-1-1V7z"
+									/>
+								</svg>
+								<div class="min-w-0 flex-1">
+									<p class="truncate font-medium">{compressFile.name}</p>
+									<p class="text-sm text-gray-500">
+										{(compressFile.size / 1024 / 1024).toFixed(2)} MB
+									</p>
 								</div>
 							</div>
 						</div>
-					{/if}
-					{#if compressFile}
-						<div class="mt-8 rounded-lg bg-white p-6 text-center">
-							{#if compressedBlob}
-								<p class="mt-2 font-medium text-green-700">
-									Compressed: {(compressedSize / 1024 / 1024).toFixed(2)} MB (saved {(
-										(1 - compressedSize / originalSize) *
-										100
-									).toFixed(1)}%)
-								</p>
-								<button
-									onclick={downloadCompressed}
-									class="mt-4 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
-								>
-									Download Compressed PDF
-								</button>
-							{:else if isCompressing}
-								<p class="mt-4 text-blue-600">Compressing... {progress}%</p>
-							{/if}
-							{#if compressStatus}
-								<p class="mt-6 text-center text-sm font-medium text-gray-700">{compressStatus}</p>
-							{/if}
-						</div>
-					{/if}
-				</div>
+					</div>
+				{/if}
+				{#if compressFile}
+					<div class="mt-8 rounded-lg bg-white p-6 text-center">
+						{#if compressedBlob}
+							<p class="mt-2 font-medium text-green-700">
+								Compressed: {(compressedSize / 1024 / 1024).toFixed(2)} MB (saved {(
+									(1 - compressedSize / originalSize) *
+									100
+								).toFixed(1)}%)
+							</p>
+							<button
+								onclick={downloadCompressed}
+								class="mt-4 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
+							>
+								Download Compressed PDF
+							</button>
+						{:else if isCompressing}
+							<p class="mt-4 text-blue-600">Compressing... {progress}%</p>
+						{/if}
+						{#if compressStatus}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{compressStatus}</p>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
-</main>
+</div>

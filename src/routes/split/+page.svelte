@@ -148,129 +148,127 @@
 	}
 </script>
 
-<main class=" flex flex-col bg-gray-50">
-	<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-		<div class="flex items-center justify-center">
-			<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
-				<!-- Split Content -->
-				<div class="px-8 py-10">
-					<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
-					<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
+<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
+	<div class="flex items-center justify-center">
+		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
+			<!-- Split Content -->
+			<div class="px-8 py-10">
+				<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
+				<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
 
-					<label
-						for="file-input"
-						class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-						class:border-green-500={dragging}
-						class:bg-green-50={dragging}
-						class:border-blue-400={!dragging}
-						class:bg-blue-50={!dragging}
-						class:hover:border-blue-500={!dragging}
-						ondragover={handleDragOver}
-						ondragleave={handleDragLeave}
-						ondrop={handleDrop}
+				<label
+					for="file-input"
+					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
+					class:border-green-500={dragging}
+					class:bg-green-50={dragging}
+					class:border-blue-400={!dragging}
+					class:bg-blue-50={!dragging}
+					class:hover:border-blue-500={!dragging}
+					ondragover={handleDragOver}
+					ondragleave={handleDragLeave}
+					ondrop={handleDrop}
+				>
+					<input
+						id="file-input"
+						type="file"
+						accept="application/pdf"
+						class="hidden"
+						onchange={(e) => handleSplitFile(e.currentTarget.files)}
+					/>
+					<svg
+						class="mx-auto mb-4 h-16 w-16 text-blue-500"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
 					>
-						<input
-							id="file-input"
-							type="file"
-							accept="application/pdf"
-							class="hidden"
-							onchange={(e) => handleSplitFile(e.currentTarget.files)}
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="1.5"
+							d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
 						/>
-						<svg
-							class="mx-auto mb-4 h-16 w-16 text-blue-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="1.5"
-								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
-							/>
-						</svg>
-						{#if dragging}
-							<p class="text-xl font-medium text-green-700">Drop here to upload</p>
-						{:else}
-							<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
-							<p class="mt-2 text-gray-600">or click to select</p>
-						{/if}
-					</label>
-
-					{#if splitDropStatus}
-						<p
-							class="mt-4 text-center text-sm {splitDropStatus.includes('allowed')
-								? 'text-red-600'
-								: 'text-green-600'}"
-						>
-							{splitDropStatus}
-						</p>
+					</svg>
+					{#if dragging}
+						<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+					{:else}
+						<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
+						<p class="mt-2 text-gray-600">or click to select</p>
 					{/if}
+				</label>
 
-					{#if splitFile}
-						<div class="mt-6 rounded-lg bg-gray-100 p-5">
-							<p class="font-medium">Selected: {splitFile.name}</p>
-							<p class="text-sm text-gray-600">Pages: {totalPages}</p>
+				{#if splitDropStatus}
+					<p
+						class="mt-4 text-center text-sm {splitDropStatus.includes('allowed')
+							? 'text-red-600'
+							: 'text-green-600'}"
+					>
+						{splitDropStatus}
+					</p>
+				{/if}
+
+				{#if splitFile}
+					<div class="mt-6 rounded-lg bg-gray-100 p-5">
+						<p class="font-medium">Selected: {splitFile.name}</p>
+						<p class="text-sm text-gray-600">Pages: {totalPages}</p>
+					</div>
+
+					<div class="mt-8">
+						<div class="mb-4 flex gap-6">
+							<label class="flex cursor-pointer items-center gap-2">
+								<input type="radio" bind:group={splitMode} value="per-page" />
+								One PDF per page
+							</label>
+							<label class="flex cursor-pointer items-center gap-2">
+								<input type="radio" bind:group={splitMode} value="range" />
+								Custom page range
+							</label>
 						</div>
 
-						<div class="mt-8">
-							<div class="mb-4 flex gap-6">
-								<label class="flex cursor-pointer items-center gap-2">
-									<input type="radio" bind:group={splitMode} value="per-page" />
-									One PDF per page
+						{#if splitMode === 'range'}
+							<div class="mt-4">
+								<label for="" class="mb-2 block text-sm font-medium text-gray-700">
+									Pages (e.g. 1-5,8,10-12)
 								</label>
-								<label class="flex cursor-pointer items-center gap-2">
-									<input type="radio" bind:group={splitMode} value="range" />
-									Custom page range
-								</label>
+								<input
+									type="text"
+									bind:value={rangeInput}
+									placeholder="1-5,8,10-12"
+									class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3"
+									disabled={isSplitting}
+								/>
+								<p class="mt-2 text-sm text-gray-500">
+									Use commas to separate, hyphen for ranges. 1-based indexing.
+								</p>
 							</div>
-
-							{#if splitMode === 'range'}
-								<div class="mt-4">
-									<label for="" class="mb-2 block text-sm font-medium text-gray-700">
-										Pages (e.g. 1-5,8,10-12)
-									</label>
-									<input
-										type="text"
-										bind:value={rangeInput}
-										placeholder="1-5,8,10-12"
-										class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3"
-										disabled={isSplitting}
-									/>
-									<p class="mt-2 text-sm text-gray-500">
-										Use commas to separate, hyphen for ranges. 1-based indexing.
-									</p>
-								</div>
-							{/if}
-						</div>
-					{/if}
-				</div>
-				{#if splitPdfDoc}
-					<div class=" bg-white px-8 pb-10">
-						<div class="flex justify-center">
-							<button
-								onclick={splitPDF}
-								disabled={!splitPdfDoc ||
-									isSplitting ||
-									(splitMode === 'range' && !rangeInput.trim())}
-								class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isSplitting || !splitPdfDoc
-									? 'bg-primary cursor-not-allowed'
-									: 'bg-green-600 hover:bg-green-700'}"
-							>
-								{isSplitting
-									? 'Splitting…'
-									: splitMode === 'per-page'
-										? 'Split into single pages'
-										: 'Extract pages'}
-							</button>
-						</div>
-						{#if splitStatus}
-							<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
 						{/if}
 					</div>
 				{/if}
 			</div>
+			{#if splitPdfDoc}
+				<div class=" bg-white px-8 pb-10">
+					<div class="flex justify-center">
+						<button
+							onclick={splitPDF}
+							disabled={!splitPdfDoc ||
+								isSplitting ||
+								(splitMode === 'range' && !rangeInput.trim())}
+							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
+                     {isSplitting || !splitPdfDoc
+								? 'bg-primary cursor-not-allowed'
+								: 'bg-green-600 hover:bg-green-700'}"
+						>
+							{isSplitting
+								? 'Splitting…'
+								: splitMode === 'per-page'
+									? 'Split into single pages'
+									: 'Extract pages'}
+						</button>
+					</div>
+					{#if splitStatus}
+						<p class="mt-6 text-center text-sm font-medium text-gray-700">{splitStatus}</p>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
-</main>
+</div>
