@@ -15,7 +15,7 @@
 	<!-- <link rel="icon" href={favicon} /> -->
 	<title>PDF Utilities</title>
 </svelte:head>
-<div class="flex min-h-screen flex-col">
+<div class="flex min-h-screen flex-col rounded-2xl">
 	<header class="flex items-center justify-between">
 		<h1 class=" mb-5 rounded-2xl py-8 text-gray-600">
 			<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/">PDF Tool Box</a>

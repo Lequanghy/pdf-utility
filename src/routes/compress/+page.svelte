@@ -3,8 +3,10 @@
 	import * as pdfjs from 'pdfjs-dist';
 	pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
+	const API_URL = 'https://pdf-utility-9tma.onrender.com/';
+
 	// Compress state
-	let compressStatus = $state('');
+	let status = $state('');
 	let compressFile: File | null = $state(null);
 
 	// Drop state
@@ -29,11 +31,13 @@
 			compressDropStatus = 'Compress mode: only one PDF allowed';
 			return;
 		}
-		pdfs.forEach(async (file) => {
-			compressFile = file;
-			compressDropStatus = 'Succesfully upload the PDF file';
-			handleCompressFile(droppedFiles);
-		});
+		// pdfs.forEach(async (file) => {
+		// 	compressFile = file;
+		// 	compressDropStatus = 'Succesfully upload the PDF file';
+		// 	compressAndDownload(droppedFiles);
+		// });
+		compressDropStatus = 'Succesfully upload the PDF file';
+		compressAndDownload(droppedFiles);
 	}
 
 	function handleDragOver(e: DragEvent) {
@@ -55,16 +59,16 @@
 	let maxDimension: number; // max width/height for images (default: 1200)
 	let jpegQuality: number; // 0.1–1.0 (default: 0.75)
 	let scaleFactor: number; // overall page scale (default: 0.75)
+	let downloadUrl: string | null = $state(null);
 
 	// Handle drop/select for compress mode
 	async function handleCompressFile(selected: FileList | null | undefined) {
 		if (!selected || selected.length === 0) return;
 		const file = selected[0];
 		if (file.type !== 'application/pdf') {
-			compressStatus = 'Please select a PDF file';
+			status = 'Please select a PDF file';
 			return;
 		}
-		console.log(selected);
 		compressFile = file;
 		originalSize = file.size;
 		compressedBlob = null;
@@ -133,10 +137,50 @@
 
 			compressedBlob = new Blob([bytes], { type: 'application/pdf' });
 			compressedSize = compressedBlob.size;
-			compressStatus = `Success! Reduced from ${(originalSize / 1024 / 1024).toFixed(2)} MB → ${(compressedSize / 1024 / 1024).toFixed(2)} MB`;
+			status = `Success! Reduced from ${(originalSize / 1024 / 1024).toFixed(2)} MB → ${(compressedSize / 1024 / 1024).toFixed(2)} MB`;
 		} catch (err) {
 			console.error('Compression failed:', err);
-			compressStatus = 'Failed to compress PDF. ';
+			status = 'Failed to compress PDF. ';
+		} finally {
+			isCompressing = false;
+		}
+	}
+
+	async function compressAndDownload(selected: FileList | null | undefined) {
+		if (!selected || selected.length === 0) return;
+		const file = selected[0];
+		if (file.type !== 'application/pdf') {
+			status = 'Please select a PDF file';
+			return;
+		}
+		originalSize = file.size;
+		compressFile = file;
+		compressedBlob = null;
+		isCompressing = true;
+		status = 'Uploading and compressing...';
+
+		try {
+			const formData = new FormData();
+			formData.append('file', compressFile);
+			const response = await fetch(API_URL, {
+				method: 'POST',
+				body: formData
+			});
+
+			if (!response.ok) {
+				const errorText = await response.text();
+				throw new Error(errorText || 'Server error');
+			}
+
+			const blob = await response.blob();
+			compressedBlob = blob;
+			compressedSize = compressedBlob.size;
+			downloadUrl = URL.createObjectURL(blob);
+
+			status = `Success! Reduced from ${(originalSize / 1024 / 1024).toFixed(2)} MB → ${(compressedSize / 1024 / 1024).toFixed(2)} MB`;
+		} catch (err) {
+			status = `Error: ${err}`;
+			console.error(err);
 		} finally {
 			isCompressing = false;
 		}
@@ -176,7 +220,7 @@
 						type="file"
 						accept="application/pdf"
 						class="hidden"
-						onchange={(e) => handleCompressFile(e.currentTarget.files)}
+						onchange={(e) => compressAndDownload(e.currentTarget.files)}
 					/>
 					<svg
 						class="mx-auto mb-4 h-16 w-16 text-blue-500"
@@ -244,8 +288,8 @@
 						{:else if isCompressing}
 							<p class="mt-4 text-blue-600">Compressing... {progress}%</p>
 						{/if}
-						{#if compressStatus}
-							<p class="mt-6 text-center text-sm font-medium text-gray-700">{compressStatus}</p>
+						{#if status}
+							<p class="mt-6 text-center text-sm font-medium text-gray-700">{status}</p>
 						{/if}
 					</div>
 				{/if}
