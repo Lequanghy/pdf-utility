@@ -3,8 +3,7 @@
 	import * as pdfjs from 'pdfjs-dist';
 	pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-	const API_URL = 'https://pdf-utility-9tma.onrender.com/';
-
+	export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 	// Compress state
 	let status = $state('');
 	let compressFile: File | null = $state(null);
@@ -162,7 +161,7 @@
 		try {
 			const formData = new FormData();
 			formData.append('file', compressFile);
-			const response = await fetch(API_URL, {
+			const response = await fetch(`${API_URL}/compress`, {
 				method: 'POST',
 				body: formData
 			});
