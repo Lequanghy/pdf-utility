@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { PDFDocument } from 'pdf-lib';
+	import { uiText } from '$lib/i18n';
 
 	// Shared state
 	let mode: 'merge' | 'split' | 'compress' = $state('merge');
@@ -23,19 +24,19 @@
 		if (!selected || selected.length === 0) return;
 		const file = selected[0];
 		if (file.type !== 'application/pdf') {
-			splitStatus = 'Please select a PDF file';
+			splitStatus = $uiText.split.selectPdf;
 			return;
 		}
 		splitFile = file;
-		splitStatus = 'Loading PDF...';
+		splitStatus = $uiText.split.loading;
 
 		try {
 			const buf = await file.arrayBuffer();
 			splitPdfDoc = await PDFDocument.load(buf);
 			totalPages = splitPdfDoc.getPageCount();
-			splitStatus = `PDF loaded — ${totalPages} page${totalPages === 1 ? '' : 's'}`;
+			splitStatus = $uiText.split.loaded(totalPages);
 		} catch (err) {
-			splitStatus = `Error loading PDF: ${err instanceof Error ? err.message : 'Invalid file'}`;
+			splitStatus = $uiText.split.loadError(err instanceof Error ? err.message : 'Invalid file');
 			splitFile = null;
 			splitPdfDoc = null;
 			totalPages = 0;
@@ -45,7 +46,7 @@
 	async function splitPDF() {
 		if (!splitPdfDoc || totalPages === 0) return;
 		isSplitting = true;
-		splitStatus = 'Splitting... please wait';
+		splitStatus = $uiText.split.splitting;
 
 		try {
 			if (splitMode === 'per-page') {
@@ -56,11 +57,11 @@
 					const bytes = await newDoc.save();
 					download(bytes, `page_${i + 1}_of_${totalPages}_${dateStr()}.pdf`);
 				}
-				splitStatus = `Success! Downloaded ${totalPages} single-page PDF${totalPages === 1 ? '' : 's'}`;
+				splitStatus = $uiText.split.perPageSuccess(totalPages);
 			} else {
 				// Range mode
 				const pagesToExtract = parsePageRange(rangeInput, totalPages);
-				if (pagesToExtract.length === 0) throw new Error('No valid pages selected');
+				if (pagesToExtract.length === 0) throw new Error($uiText.split.noValidPages);
 
 				const newDoc = await PDFDocument.create();
 				const copied = await newDoc.copyPages(splitPdfDoc, pagesToExtract);
@@ -68,10 +69,10 @@
 
 				const bytes = await newDoc.save();
 				download(bytes, `extracted_${pagesToExtract.length}_pages_${dateStr()}.pdf`);
-				splitStatus = `Success! Extracted ${pagesToExtract.length} page${pagesToExtract.length === 1 ? '' : 's'}`;
+				splitStatus = $uiText.split.rangeSuccess(pagesToExtract.length);
 			}
 		} catch (err) {
-			splitStatus = `Error: ${err instanceof Error ? err.message : 'Failed to split'}`;
+			splitStatus = `Error: ${err instanceof Error ? err.message : $uiText.split.failed}`;
 		} finally {
 			isSplitting = false;
 		}
@@ -123,11 +124,11 @@
 		const pdfs = Array.from(droppedFiles).filter((f) => f.type === 'application/pdf');
 
 		if (pdfs.length === 0) {
-			mergeDropStatus = 'Please drop PDF files only';
+			mergeDropStatus = $uiText.split.dropOnlyPdf;
 			return;
 		}
 		if (mode === 'split' && droppedFiles.length > 1) {
-			splitDropStatus = 'Split mode: only one PDF allowed';
+			splitDropStatus = $uiText.split.onePdfOnly;
 			return;
 		}
 
@@ -153,8 +154,8 @@
 		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
 			<!-- Split Content -->
 			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900">Split PDF</h2>
-				<p class="mb-6 text-gray-600">Extract pages or split into single-page files</p>
+				<h2 class="mb-3 text-2xl font-bold text-gray-900">{$uiText.split.title}</h2>
+				<p class="mb-6 text-gray-600">{$uiText.split.description}</p>
 
 				<label
 					for="file-input"
@@ -189,10 +190,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+						<p class="text-xl font-medium text-green-700">{$uiText.split.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
-						<p class="mt-2 text-gray-600">or click to select</p>
+						<p class="text-xl font-medium text-gray-800">{$uiText.split.dropIdle}</p>
+						<p class="mt-2 text-gray-600">{$uiText.split.dropHelp}</p>
 					{/if}
 				</label>
 
@@ -208,36 +209,36 @@
 
 				{#if splitFile}
 					<div class="mt-6 rounded-lg bg-gray-100 p-5">
-						<p class="font-medium">Selected: {splitFile.name}</p>
-						<p class="text-sm text-gray-600">Pages: {totalPages}</p>
+						<p class="font-medium">{$uiText.split.selected}: {splitFile.name}</p>
+						<p class="text-sm text-gray-600">{$uiText.split.pages}: {totalPages}</p>
 					</div>
 
 					<div class="mt-8">
 						<div class="mb-4 flex gap-6">
 							<label class="flex cursor-pointer items-center gap-2">
 								<input type="radio" bind:group={splitMode} value="per-page" />
-								One PDF per page
+								{$uiText.split.perPageOption}
 							</label>
 							<label class="flex cursor-pointer items-center gap-2">
 								<input type="radio" bind:group={splitMode} value="range" />
-								Custom page range
+								{$uiText.split.rangeOption}
 							</label>
 						</div>
 
 						{#if splitMode === 'range'}
 							<div class="mt-4">
 								<label for="" class="mb-2 block text-sm font-medium text-gray-700">
-									Pages (e.g. 1-5,8,10-12)
+									{$uiText.split.rangeLabel}
 								</label>
 								<input
 									type="text"
 									bind:value={rangeInput}
-									placeholder="1-5,8,10-12"
+									placeholder={$uiText.split.rangePlaceholder}
 									class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3"
 									disabled={isSplitting}
 								/>
 								<p class="mt-2 text-sm text-gray-500">
-									Use commas to separate, hyphen for ranges. 1-based indexing.
+									{$uiText.split.rangeHelp}
 								</p>
 							</div>
 						{/if}
@@ -258,10 +259,10 @@
 								: 'bg-green-600 hover:bg-green-700'}"
 						>
 							{isSplitting
-								? 'Splitting…'
+								? $uiText.split.buttonBusy
 								: splitMode === 'per-page'
-									? 'Split into single pages'
-									: 'Extract pages'}
+									? $uiText.split.buttonPerPage
+									: $uiText.split.buttonRange}
 						</button>
 					</div>
 					{#if splitStatus}

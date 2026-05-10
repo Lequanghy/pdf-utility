@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { PDFDocument, StandardFonts } from 'pdf-lib';
 	import * as pdfjs from 'pdfjs-dist';
+	import { uiText } from '$lib/i18n';
 	pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 	export const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -23,11 +24,11 @@
 		const pdfs = Array.from(droppedFiles).filter((f) => f.type === 'application/pdf');
 
 		if (pdfs.length === 0) {
-			compressDropStatus = 'Please drop PDF files only';
+			compressDropStatus = $uiText.compress.dropOnlyPdf;
 			return;
 		}
 		if (droppedFiles.length > 1) {
-			compressDropStatus = 'Compress mode: only one PDF allowed';
+			compressDropStatus = $uiText.compress.onePdfOnly;
 			return;
 		}
 		// pdfs.forEach(async (file) => {
@@ -35,7 +36,7 @@
 		// 	compressDropStatus = 'Succesfully upload the PDF file';
 		// 	compressAndDownload(droppedFiles);
 		// });
-		compressDropStatus = 'Succesfully upload the PDF file';
+		compressDropStatus = $uiText.compress.uploadSuccess;
 		compressAndDownload(droppedFiles);
 	}
 
@@ -64,14 +65,14 @@
 		if (!selected || selected.length === 0) return;
 		const file = selected[0];
 		if (file.type !== 'application/pdf') {
-			status = 'Please select a PDF file';
+			status = $uiText.compress.selectPdf;
 			return;
 		}
 		originalSize = file.size;
 		compressFile = file;
 		compressedBlob = null;
 		isCompressing = true;
-		status = 'Uploading and compressing...';
+		status = $uiText.compress.uploading;
 
 		try {
 			const formData = new FormData();
@@ -91,7 +92,10 @@
 			compressedSize = compressedBlob.size;
 			downloadUrl = URL.createObjectURL(blob);
 
-			status = `Success! Reduced from ${(originalSize / 1024 / 1024).toFixed(2)} MB → ${(compressedSize / 1024 / 1024).toFixed(2)} MB`;
+			status = $uiText.compress.success(
+				(originalSize / 1024 / 1024).toFixed(2),
+				(compressedSize / 1024 / 1024).toFixed(2)
+			);
 		} catch (err) {
 			status = `Error: ${err}`;
 			console.error(err);
@@ -115,8 +119,8 @@
 	<div class="flex items-center justify-center">
 		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
 			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900">Compress PDF</h2>
-				<p class="mb-6 text-gray-600">Reduce file size while trying to preserve quality</p>
+				<h2 class="mb-3 text-2xl font-bold text-gray-900">{$uiText.compress.title}</h2>
+				<p class="mb-6 text-gray-600">{$uiText.compress.description}</p>
 				<label
 					for="file-input"
 					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
@@ -150,10 +154,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+						<p class="text-xl font-medium text-green-700">{$uiText.compress.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800">Drop a PDF file here</p>
-						<p class="mt-2 text-gray-600">or click to select</p>
+						<p class="text-xl font-medium text-gray-800">{$uiText.compress.dropIdle}</p>
+						<p class="mt-2 text-gray-600">{$uiText.compress.dropHelp}</p>
 					{/if}
 				</label>
 				{#if compressDropStatus}
@@ -188,19 +192,19 @@
 					<div class="mt-8 rounded-lg bg-white p-6 text-center">
 						{#if compressedBlob}
 							<p class="mt-2 font-medium text-green-700">
-								Compressed: {(compressedSize / 1024 / 1024).toFixed(2)} MB (saved {(
-									(1 - compressedSize / originalSize) *
-									100
-								).toFixed(1)}%)
+								{$uiText.compress.compressedSummary(
+									(compressedSize / 1024 / 1024).toFixed(2),
+									(((1 - compressedSize / originalSize) * 100).toFixed(1))
+								)}
 							</p>
 							<button
 								onclick={downloadCompressed}
 								class="mt-4 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
 							>
-								Download Compressed PDF
+								{$uiText.compress.download}
 							</button>
 						{:else if isCompressing}
-							<p class="mt-4 text-blue-600">Compressing... {progress}%</p>
+							<p class="mt-4 text-blue-600">{$uiText.compress.compressing(progress)}</p>
 						{/if}
 						{#if status}
 							<p class="mt-6 text-center text-sm font-medium text-gray-700">{status}</p>

@@ -2,27 +2,58 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { page } from '$app/state';
+	import { initLanguage, language, setLanguage, uiText, type Language } from '$lib/i18n';
 
 	const menu = [
-		{ href: '/merge', label: 'Merge', id: 'merge' },
-		{ href: '/split', label: 'Split', id: 'split' },
-		{ href: '/compress', label: 'Compress', id: 'compress' }
-	];
+		{ href: '/merge', labelKey: 'merge' },
+		{ href: '/split', labelKey: 'split' },
+		{ href: '/compress', labelKey: 'compress' }
+	] as const;
 	let { children } = $props();
+
+	initLanguage();
+
+	function handleLanguageChange(nextLanguage: Language) {
+		setLanguage(nextLanguage);
+	}
 </script>
 
 <svelte:head>
 	<!-- <link rel="icon" href={favicon} /> -->
-	<title>PDF Utilities</title>
+	<title>{$uiText.appTitle}</title>
 </svelte:head>
 <div class="flex min-h-screen flex-col rounded-2xl">
-	<header class="flex items-center justify-between">
-		<h1 class=" mb-5 rounded-2xl py-8 text-gray-600">
-			<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/">PDF Tool Box</a>
+	<header class="flex flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-0">
+		<h1 class="rounded-2xl text-gray-600">
+			<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/">{$uiText.appTitle}</a>
 		</h1>
-		<nav class="bg-primary">
-			<div class="mx-auto max-w-6xl px-4">
-				<ul class="flex space-x-6">
+		<div class="flex flex-col items-start gap-4 md:items-end">
+			<div class="flex items-center gap-2 px-4 md:px-0">
+				<span class="text-sm font-medium text-gray-600">{$uiText.languageToggle.label}</span>
+				<div class="inline-flex rounded-lg border border-gray-300 bg-white p-1 shadow-sm">
+					<button
+						type="button"
+						onclick={() => handleLanguageChange('en')}
+						class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$language === 'en'
+							? 'bg-gray-900 text-white'
+							: 'text-gray-600 hover:bg-gray-100'}"
+					>
+						{$uiText.languageToggle.english}
+					</button>
+					<button
+						type="button"
+						onclick={() => handleLanguageChange('vi')}
+						class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$language === 'vi'
+							? 'bg-gray-900 text-white'
+							: 'text-gray-600 hover:bg-gray-100'}"
+					>
+						{$uiText.languageToggle.vietnamese}
+					</button>
+				</div>
+			</div>
+			<nav class="bg-primary">
+				<div class="mx-auto max-w-6xl px-4">
+					<ul class="flex space-x-6">
 					{#each menu as item}
 						<li>
 							<a
@@ -34,13 +65,14 @@
 									: 'text-gray-600 hover:text-gray-900'}
             "
 							>
-								{item.label}
+								{$uiText.nav[item.labelKey]}
 							</a>
 						</li>
 					{/each}
-				</ul>
-			</div>
-		</nav>
+					</ul>
+				</div>
+			</nav>
+		</div>
 	</header>
 
 	<main class=" flex flex-col bg-gray-50">
@@ -50,7 +82,7 @@
 	<footer class="mt-auto border-t bg-white py-6 text-center text-sm text-gray-500">
 		<div class="flex items-center justify-center gap-3 text-gray-600">
 			<span class="text-sm font-medium"
-				>Crafted by
+				>{$uiText.footer.craftedBy}
 				<span class="font-bold">Le Quang Hy</span></span
 			>
 			<span class="text-gray-400">•</span>

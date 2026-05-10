@@ -5,6 +5,7 @@
 		mergeFilesToPdf,
 		type MergeableFile
 	} from '$lib/pdf/merge';
+	import { uiText } from '$lib/i18n';
 
 	let mergeFiles: MergeableFile[] = $state([]);
 	let mergeStatus = $state('');
@@ -15,13 +16,13 @@
 	async function handleMergeFiles(selected: FileList | null | undefined) {
 		const validFiles = getMergeableFiles(selected);
 		if (validFiles.length === 0) {
-			mergeStatus = 'Please select PDF, JPG, PNG, or WEBP files';
+			mergeStatus = $uiText.merge.invalidSelection;
 			return;
 		}
 
 		mergeFiles = [...mergeFiles, ...validFiles];
 		mergeDropStatus = '';
-		mergeStatus = `${mergeFiles.length} file${mergeFiles.length === 1 ? '' : 's'} ready to merge`;
+		mergeStatus = $uiText.merge.filesReady(mergeFiles.length);
 	}
 
 	function removeMergeFile(index: number) {
@@ -29,7 +30,7 @@
 		mergeStatus =
 			mergeFiles.length === 0
 				? ''
-				: `${mergeFiles.length} file${mergeFiles.length === 1 ? '' : 's'} ready to merge`;
+				: $uiText.merge.filesReady(mergeFiles.length);
 	}
 
 	function moveMergeFile(fromIndex: number, toIndex: number) {
@@ -41,20 +42,20 @@
 		const [item] = reordered.splice(fromIndex, 1);
 		reordered.splice(toIndex, 0, item);
 		mergeFiles = reordered;
-		mergeStatus = 'File order updated';
+		mergeStatus = $uiText.merge.fileOrderUpdated;
 	}
 
 	async function mergePDFs() {
 		if (mergeFiles.length === 0) return;
 		isMerging = true;
-		mergeStatus = 'Merging files... please wait';
+		mergeStatus = $uiText.merge.merging;
 
 		try {
 			const bytes = await mergeFilesToPdf(mergeFiles);
 			download(bytes, `merged_${dateStr()}.pdf`);
-			mergeStatus = `Success! Merged ${mergeFiles.length} file${mergeFiles.length === 1 ? '' : 's'}`;
+			mergeStatus = $uiText.merge.success(mergeFiles.length);
 		} catch (err) {
-			mergeStatus = `Error: ${err instanceof Error ? err.message : 'Failed to merge files'}`;
+			mergeStatus = `Error: ${err instanceof Error ? err.message : $uiText.merge.failed}`;
 		} finally {
 			isMerging = false;
 		}
@@ -83,7 +84,7 @@
 
 		const hasUnsupportedFiles = Array.from(droppedFiles).some((file) => !getMergeableFileKind(file));
 		if (hasUnsupportedFiles) {
-			mergeDropStatus = 'Only PDF, JPG, PNG, and WEBP files are supported';
+			mergeDropStatus = $uiText.merge.unsupportedFiles;
 			return;
 		}
 
@@ -104,8 +105,8 @@
 	<div class="flex items-center justify-center">
 		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
 			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900">Merge PDFs and Images</h2>
-				<p class="mb-6 text-gray-600">Combine PDFs plus JPG, PNG, or WEBP images into one PDF</p>
+				<h2 class="mb-3 text-2xl font-bold text-gray-900">{$uiText.merge.title}</h2>
+				<p class="mb-6 text-gray-600">{$uiText.merge.description}</p>
 				<label
 					for="file-input"
 					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
@@ -140,10 +141,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700">Drop here to upload</p>
+						<p class="text-xl font-medium text-green-700">{$uiText.merge.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800">Drop PDF or image files here</p>
-						<p class="mt-2 text-gray-600">or click to select PDFs, JPGs, PNGs, and WEBPs</p>
+						<p class="text-xl font-medium text-gray-800">{$uiText.merge.dropIdle}</p>
+						<p class="mt-2 text-gray-600">{$uiText.merge.dropHelp}</p>
 					{/if}
 				</label>
 
@@ -160,8 +161,8 @@
 				{#if mergeFiles.length > 0}
 					<div class="mt-8">
 						<div class="mb-3 flex items-center justify-between gap-4">
-							<p class="text-sm font-medium text-gray-700">Merge order</p>
-							<p class="text-sm text-gray-500">Use the arrows to reorder files before merging</p>
+							<p class="text-sm font-medium text-gray-700">{$uiText.merge.orderTitle}</p>
+							<p class="text-sm text-gray-500">{$uiText.merge.orderDescription}</p>
 						</div>
 						<div class="space-y-3">
 						{#each mergeFiles as item, i (item.file.name + i)}
@@ -205,7 +206,7 @@
 										type="button"
 										onclick={() => moveMergeFile(i, i - 1)}
 										disabled={i === 0}
-										aria-label={`Move ${item.file.name} up`}
+										aria-label={$uiText.merge.moveUp(item.file.name)}
 										class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
 									>
 										↑
@@ -214,7 +215,7 @@
 										type="button"
 										onclick={() => moveMergeFile(i, i + 1)}
 										disabled={i === mergeFiles.length - 1}
-										aria-label={`Move ${item.file.name} down`}
+										aria-label={$uiText.merge.moveDown(item.file.name)}
 										class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
 									>
 										↓
@@ -224,7 +225,7 @@
 										onclick={() => removeMergeFile(i)}
 										class="ml-1 text-red-600 hover:text-red-800"
 									>
-										Remove
+										{$uiText.merge.remove}
 									</button>
 								</div>
 							</div>
@@ -247,7 +248,7 @@
 						>
 							{isMerging
 								? 'Merging…'
-								: `Merge ${mergeFiles.length || ''} File${mergeFiles.length !== 1 ? 's' : ''}`}
+								: $uiText.merge.mergeButton(mergeFiles.length)}
 						</button>
 					</div>
 					{#if mergeStatus}
