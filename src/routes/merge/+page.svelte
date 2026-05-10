@@ -32,6 +32,18 @@
 				: `${mergeFiles.length} file${mergeFiles.length === 1 ? '' : 's'} ready to merge`;
 	}
 
+	function moveMergeFile(fromIndex: number, toIndex: number) {
+		if (toIndex < 0 || toIndex >= mergeFiles.length || fromIndex === toIndex) {
+			return;
+		}
+
+		const reordered = [...mergeFiles];
+		const [item] = reordered.splice(fromIndex, 1);
+		reordered.splice(toIndex, 0, item);
+		mergeFiles = reordered;
+		mergeStatus = 'File order updated';
+	}
+
 	async function mergePDFs() {
 		if (mergeFiles.length === 0) return;
 		isMerging = true;
@@ -146,10 +158,20 @@
 				{/if}
 
 				{#if mergeFiles.length > 0}
-					<div class="mt-8 space-y-3">
+					<div class="mt-8">
+						<div class="mb-3 flex items-center justify-between gap-4">
+							<p class="text-sm font-medium text-gray-700">Merge order</p>
+							<p class="text-sm text-gray-500">Use the arrows to reorder files before merging</p>
+						</div>
+						<div class="space-y-3">
 						{#each mergeFiles as item, i (item.file.name + i)}
-							<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
+							<div class="flex items-center justify-between gap-4 rounded-lg bg-gray-100 px-5 py-3">
 								<div class="flex min-w-0 flex-1 items-center gap-3">
+									<div
+										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-gray-700"
+									>
+										{i + 1}
+									</div>
 									{#if item.kind === 'pdf'}
 										<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 											<path
@@ -178,12 +200,36 @@
 										</p>
 									</div>
 								</div>
-								<button
-									onclick={() => removeMergeFile(i)}
-									class="ml-4 text-red-600 hover:text-red-800">Remove</button
-								>
+								<div class="flex shrink-0 items-center gap-2">
+									<button
+										type="button"
+										onclick={() => moveMergeFile(i, i - 1)}
+										disabled={i === 0}
+										aria-label={`Move ${item.file.name} up`}
+										class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+									>
+										↑
+									</button>
+									<button
+										type="button"
+										onclick={() => moveMergeFile(i, i + 1)}
+										disabled={i === mergeFiles.length - 1}
+										aria-label={`Move ${item.file.name} down`}
+										class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+									>
+										↓
+									</button>
+									<button
+										type="button"
+										onclick={() => removeMergeFile(i)}
+										class="ml-1 text-red-600 hover:text-red-800"
+									>
+										Remove
+									</button>
+								</div>
 							</div>
 						{/each}
+						</div>
 					</div>
 				{/if}
 			</div>
