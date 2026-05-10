@@ -33,6 +33,12 @@
 				: $uiText.merge.filesReady(mergeFiles.length);
 	}
 
+	function clearMergeFiles() {
+		mergeFiles = [];
+		mergeStatus = '';
+		mergeDropStatus = '';
+	}
+
 	function moveMergeFile(fromIndex: number, toIndex: number) {
 		if (toIndex < 0 || toIndex >= mergeFiles.length || fromIndex === toIndex) {
 			return;
@@ -161,8 +167,17 @@
 				{#if mergeFiles.length > 0}
 					<div class="mt-8">
 						<div class="mb-3 flex items-center justify-between gap-4">
-							<p class="text-sm font-medium text-gray-700">{$uiText.merge.orderTitle}</p>
-							<p class="text-sm text-gray-500">{$uiText.merge.orderDescription}</p>
+							<div>
+								<p class="text-sm font-medium text-gray-700">{$uiText.merge.orderTitle}</p>
+								<p class="text-sm text-gray-500">{$uiText.merge.orderDescription}</p>
+							</div>
+							<button
+								type="button"
+								onclick={clearMergeFiles}
+								class="shrink-0 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
+							>
+								{$uiText.merge.clearAll}
+							</button>
 						</div>
 						<div class="space-y-3">
 						{#each mergeFiles as item, i (item.file.name + i)}
