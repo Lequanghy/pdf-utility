@@ -31,6 +31,8 @@ export const uiText = derived(language, ($language) => translations[$language]);
 export const translations = {
 	en: {
 		appTitle: 'PDF Tool Box',
+		shellCopy:
+			'Client-side PDF tools with a lighter, faster workspace for merging, splitting, and compressing files.',
 		nav: {
 			merge: 'Merge',
 			split: 'Split',
@@ -131,6 +133,8 @@ export const translations = {
 	},
 	vi: {
 		appTitle: 'Công Cụ PDF',
+		shellCopy:
+			'Các công cụ PDF chạy trên trình duyệt với không gian làm việc gọn gàng và nhanh hơn để ghép, tách và nén tệp.',
 		nav: {
 			merge: 'Ghép',
 			split: 'Tách',

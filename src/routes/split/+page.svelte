@@ -149,26 +149,21 @@
 	}
 </script>
 
-<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-	<div class="flex items-center justify-center">
-		<div
-			class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-slate-900 dark:shadow-slate-950/40"
-		>
-			<!-- Split Content -->
-			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900 dark:text-slate-100">
+<div class="page-shell">
+	<div class="tool-panel">
+		<div class="space-y-8">
+			<div>
+				<p class="section-kicker">{$uiText.nav.split}</p>
+				<h2 class="text-3xl font-semibold tracking-[-0.05em] text-[var(--app-text)] sm:text-4xl">
 					{$uiText.split.title}
 				</h2>
-				<p class="mb-6 text-gray-600 dark:text-slate-400">{$uiText.split.description}</p>
+				<p class="page-copy">{$uiText.split.description}</p>
+			</div>
 
 				<label
 					for="file-input"
-					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-					class:border-green-500={dragging}
-					class:bg-green-50={dragging}
-					class:border-blue-400={!dragging}
-					class:bg-blue-50={!dragging}
-					class:hover:border-blue-500={!dragging}
+					class="dropzone-panel cursor-pointer"
+					class:is-dragging={dragging}
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}
@@ -180,12 +175,7 @@
 						class="hidden"
 						onchange={(e) => handleSplitFile(e.currentTarget.files)}
 					/>
-					<svg
-						class="mx-auto mb-4 h-16 w-16 text-blue-500"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
+					<svg class="dropzone-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -194,14 +184,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700 dark:text-slate-800">
-							{$uiText.split.dropActive}
-						</p>
+						<p class="dropzone-title">{$uiText.split.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800 dark:text-slate-800">
-							{$uiText.split.dropIdle}
-						</p>
-						<p class="mt-2 text-gray-600 dark:text-slate-600">{$uiText.split.dropHelp}</p>
+						<p class="dropzone-title">{$uiText.split.dropIdle}</p>
+						<p class="dropzone-copy">{$uiText.split.dropHelp}</p>
 					{/if}
 				</label>
 
@@ -216,11 +202,11 @@
 				{/if}
 
 				{#if splitFile}
-					<div class="mt-6 rounded-lg bg-gray-100 p-5 dark:bg-slate-800">
-						<p class="font-medium">{$uiText.split.selected}: {splitFile.name}</p>
-						<p class="text-sm text-gray-600 dark:text-slate-400">
-							{$uiText.split.pages}: {totalPages}
-						</p>
+					<div class="queue-card">
+						<div>
+							<p class="font-medium text-[var(--app-text)]">{$uiText.split.selected}: {splitFile.name}</p>
+							<p class="meta-copy">{$uiText.split.pages}: {totalPages}</p>
+						</div>
 					</div>
 
 					<div class="mt-8">
@@ -237,54 +223,42 @@
 
 						{#if splitMode === 'range'}
 							<div class="mt-4">
-								<label
-									for=""
-									class="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-200"
-								>
+								<label for="" class="mb-2 block text-sm font-medium text-[var(--app-text)]">
 									{$uiText.split.rangeLabel}
 								</label>
 								<input
 									type="text"
 									bind:value={rangeInput}
 									placeholder={$uiText.split.rangePlaceholder}
-									class="focus:border-primary focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-3 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+									class="input-field"
 									disabled={isSplitting}
 								/>
-								<p class="mt-2 text-sm text-gray-500 dark:text-slate-500">
-									{$uiText.split.rangeHelp}
-								</p>
+								<p class="mt-2 meta-copy">{$uiText.split.rangeHelp}</p>
 							</div>
 						{/if}
 					</div>
 				{/if}
-			</div>
-			{#if splitPdfDoc}
-				<div class="bg-white px-8 pb-10 dark:bg-slate-900">
-					<div class="flex justify-center">
-						<button
-							onclick={splitPDF}
-							disabled={!splitPdfDoc ||
-								isSplitting ||
-								(splitMode === 'range' && !rangeInput.trim())}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isSplitting || !splitPdfDoc
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-green-600 hover:bg-green-700'}"
-						>
-							{isSplitting
-								? $uiText.split.buttonBusy
-								: splitMode === 'per-page'
-									? $uiText.split.buttonPerPage
-									: $uiText.split.buttonRange}
-						</button>
-					</div>
-					{#if splitStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700 dark:text-slate-300">
-							{splitStatus}
-						</p>
-					{/if}
-				</div>
-			{/if}
 		</div>
+		{#if splitPdfDoc}
+			<div class="mt-8 space-y-5">
+				<div class="divider-line"></div>
+				<div class="flex justify-center">
+					<button
+						onclick={splitPDF}
+						disabled={!splitPdfDoc || isSplitting || (splitMode === 'range' && !rangeInput.trim())}
+						class="primary-button"
+					>
+						{isSplitting
+							? $uiText.split.buttonBusy
+							: splitMode === 'per-page'
+								? $uiText.split.buttonPerPage
+								: $uiText.split.buttonRange}
+					</button>
+				</div>
+				{#if splitStatus}
+					<p class="status-copy text-center">{splitStatus}</p>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </div>

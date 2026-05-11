@@ -106,24 +106,20 @@
 	}
 </script>
 
-<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-	<div class="flex items-center justify-center">
-		<div
-			class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-slate-900 dark:shadow-slate-950/40"
-		>
-			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900 dark:text-slate-100">
+<div class="page-shell">
+	<div class="tool-panel">
+		<div class="space-y-8">
+			<div>
+				<p class="section-kicker">{$uiText.nav.merge}</p>
+				<h2 class="text-3xl font-semibold tracking-[-0.05em] text-[var(--app-text)] sm:text-4xl">
 					{$uiText.merge.title}
 				</h2>
-				<p class="mb-6 text-gray-600 dark:text-slate-400">{$uiText.merge.description}</p>
+				<p class="page-copy">{$uiText.merge.description}</p>
+			</div>
 				<label
 					for="file-input"
-					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-					class:border-green-500={dragging}
-					class:bg-green-50={dragging}
-					class:border-blue-400={!dragging}
-					class:bg-blue-50={!dragging}
-					class:hover:border-blue-500={!dragging}
+					class="dropzone-panel cursor-pointer"
+					class:is-dragging={dragging}
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}
@@ -136,12 +132,7 @@
 						class="hidden"
 						onchange={(e) => handleMergeFiles(e.currentTarget.files)}
 					/>
-					<svg
-						class="mx-auto mb-4 h-16 w-16 text-blue-500"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
+					<svg class="dropzone-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -150,14 +141,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700 dark:text-slate-800">
-							{$uiText.merge.dropActive}
-						</p>
+						<p class="dropzone-title">{$uiText.merge.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800 dark:text-slate-800">
-							{$uiText.merge.dropIdle}
-						</p>
-						<p class="mt-2 text-gray-600 dark:text-slate-600">{$uiText.merge.dropHelp}</p>
+						<p class="dropzone-title">{$uiText.merge.dropIdle}</p>
+						<p class="dropzone-copy">{$uiText.merge.dropHelp}</p>
 					{/if}
 				</label>
 
@@ -173,34 +160,20 @@
 
 				{#if mergeFiles.length > 0}
 					<div class="mt-8">
-						<div class="mb-3 flex items-center justify-between gap-4">
+						<div class="mb-4 flex items-center justify-between gap-4">
 							<div>
-								<p class="text-sm font-medium text-gray-700 dark:text-slate-200">
-									{$uiText.merge.orderTitle}
-								</p>
-								<p class="text-sm text-gray-500 dark:text-slate-500">
-									{$uiText.merge.orderDescription}
-								</p>
+								<p class="text-sm font-medium text-[var(--app-text)]">{$uiText.merge.orderTitle}</p>
+								<p class="meta-copy">{$uiText.merge.orderDescription}</p>
 							</div>
-							<button
-								type="button"
-								onclick={clearMergeFiles}
-								class="shrink-0 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100"
-							>
+							<button type="button" onclick={clearMergeFiles} class="danger-button shrink-0">
 								{$uiText.merge.clearAll}
 							</button>
 						</div>
 						<div class="space-y-3">
 							{#each mergeFiles as item, i (item.file.name + i)}
-								<div
-									class="flex items-center justify-between gap-4 rounded-lg bg-gray-100 px-5 py-3 dark:bg-slate-800"
-								>
+								<div class="queue-card">
 									<div class="flex min-w-0 flex-1 items-center gap-3">
-										<div
-											class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-gray-700 dark:bg-slate-700 dark:text-slate-100"
-										>
-											{i + 1}
-										</div>
+										<div class="queue-index">{i + 1}</div>
 										{#if item.kind === 'pdf'}
 											<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 												<path
@@ -223,8 +196,8 @@
 											</svg>
 										{/if}
 										<div class="min-w-0 flex-1">
-											<p class="truncate font-medium">{item.file.name}</p>
-											<p class="text-sm text-gray-500 dark:text-slate-400">
+											<p class="truncate font-medium text-[var(--app-text)]">{item.file.name}</p>
+											<p class="meta-copy">
 												{item.kind.toUpperCase()} • {(item.file.size / 1024 / 1024).toFixed(2)} MB
 											</p>
 										</div>
@@ -235,7 +208,7 @@
 											onclick={() => moveMergeFile(i, i - 1)}
 											disabled={i === 0}
 											aria-label={$uiText.merge.moveUp(item.file.name)}
-											class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-600"
+											class="icon-button disabled:cursor-not-allowed disabled:opacity-40"
 										>
 											↑
 										</button>
@@ -244,15 +217,11 @@
 											onclick={() => moveMergeFile(i, i + 1)}
 											disabled={i === mergeFiles.length - 1}
 											aria-label={$uiText.merge.moveDown(item.file.name)}
-											class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-gray-400 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:hover:border-slate-500 dark:hover:bg-slate-600"
+											class="icon-button disabled:cursor-not-allowed disabled:opacity-40"
 										>
 											↓
 										</button>
-										<button
-											type="button"
-											onclick={() => removeMergeFile(i)}
-											class="ml-1 text-red-600 hover:text-red-800"
-										>
+										<button type="button" onclick={() => removeMergeFile(i)} class="danger-button">
 											{$uiText.merge.remove}
 										</button>
 									</div>
@@ -261,29 +230,24 @@
 						</div>
 					</div>
 				{/if}
-			</div>
-			{#if mergeFiles.length > 0}
-				<div class="bg-white px-8 pb-10 dark:bg-slate-900">
-					<div class="flex justify-center">
-						<button
-							id="mergeBtn"
-							onclick={mergePDFs}
-							disabled={mergeFiles.length === 0 || isMerging}
-							class="rounded-xl px-10 py-4 font-semibold text-white shadow-md transition-all
-                     {isMerging || mergeFiles.length === 0
-								? 'bg-primary cursor-not-allowed'
-								: 'bg-green-600 hover:bg-green-700'}"
-						>
-							{isMerging ? 'Merging…' : $uiText.merge.mergeButton(mergeFiles.length)}
-						</button>
-					</div>
-					{#if mergeStatus}
-						<p class="mt-6 text-center text-sm font-medium text-gray-700 dark:text-slate-300">
-							{mergeStatus}
-						</p>
-					{/if}
-				</div>
-			{/if}
 		</div>
+		{#if mergeFiles.length > 0}
+			<div class="mt-8 space-y-5">
+				<div class="divider-line"></div>
+				<div class="flex justify-center">
+					<button
+						id="mergeBtn"
+						onclick={mergePDFs}
+						disabled={mergeFiles.length === 0 || isMerging}
+						class="primary-button"
+					>
+						{isMerging ? 'Merging…' : $uiText.merge.mergeButton(mergeFiles.length)}
+					</button>
+				</div>
+				{#if mergeStatus}
+					<p class="status-copy text-center">{mergeStatus}</p>
+				{/if}
+			</div>
+		{/if}
 	</div>
 </div>

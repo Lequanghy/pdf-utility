@@ -115,24 +115,20 @@
 	}
 </script>
 
-<div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
-	<div class="flex items-center justify-center">
-		<div
-			class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-slate-900 dark:shadow-slate-950/40"
-		>
-			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900 dark:text-slate-100">
+<div class="page-shell">
+	<div class="tool-panel">
+		<div class="space-y-8">
+			<div>
+				<p class="section-kicker">{$uiText.nav.compress}</p>
+				<h2 class="text-3xl font-semibold tracking-[-0.05em] text-[var(--app-text)] sm:text-4xl">
 					{$uiText.compress.title}
 				</h2>
-				<p class="mb-6 text-gray-600 dark:text-slate-400">{$uiText.compress.description}</p>
+				<p class="page-copy">{$uiText.compress.description}</p>
+			</div>
 				<label
 					for="file-input"
-					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
-					class:border-green-500={dragging}
-					class:bg-green-50={dragging}
-					class:border-blue-400={!dragging}
-					class:bg-blue-50={!dragging}
-					class:hover:border-blue-500={!dragging}
+					class="dropzone-panel cursor-pointer"
+					class:is-dragging={dragging}
 					ondragover={handleDragOver}
 					ondragleave={handleDragLeave}
 					ondrop={handleDrop}
@@ -144,12 +140,7 @@
 						class="hidden"
 						onchange={(e) => compressAndDownload(e.currentTarget.files)}
 					/>
-					<svg
-						class="mx-auto mb-4 h-16 w-16 text-blue-500"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
+					<svg class="dropzone-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path
 							stroke-linecap="round"
 							stroke-linejoin="round"
@@ -158,14 +149,10 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700 dark:text-slate-800">
-							{$uiText.compress.dropActive}
-						</p>
+						<p class="dropzone-title">{$uiText.compress.dropActive}</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800 dark:text-slate-800">
-							{$uiText.compress.dropIdle}
-						</p>
-						<p class="mt-2 text-gray-600 dark:text-slate-600">{$uiText.compress.dropHelp}</p>
+						<p class="dropzone-title">{$uiText.compress.dropIdle}</p>
+						<p class="dropzone-copy">{$uiText.compress.dropHelp}</p>
 					{/if}
 				</label>
 				{#if compressDropStatus}
@@ -179,9 +166,7 @@
 				{/if}
 				{#if compressFile}
 					<div class="mt-8 space-y-3">
-						<div
-							class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3 dark:bg-slate-800"
-						>
+						<div class="queue-card">
 							<div class="flex min-w-0 flex-1 items-center gap-3">
 								<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 									<path
@@ -189,8 +174,8 @@
 									/>
 								</svg>
 								<div class="min-w-0 flex-1">
-									<p class="truncate font-medium">{compressFile.name}</p>
-									<p class="text-sm text-gray-500 dark:text-slate-400">
+									<p class="truncate font-medium text-[var(--app-text)]">{compressFile.name}</p>
+									<p class="meta-copy">
 										{(compressFile.size / 1024 / 1024).toFixed(2)} MB
 									</p>
 								</div>
@@ -199,31 +184,27 @@
 					</div>
 				{/if}
 				{#if compressFile}
-					<div class="mt-8 rounded-lg bg-white p-6 text-center dark:bg-slate-900">
+					<div class="mt-8 rounded-[1.6rem] border border-[var(--app-border)] bg-[var(--app-surface-soft)] p-6 text-center">
 						{#if compressedBlob}
-							<p class="mt-2 font-medium text-green-700">
+							<p class="mt-2 font-medium text-[var(--app-text)]">
 								{$uiText.compress.compressedSummary(
 									(compressedSize / 1024 / 1024).toFixed(2),
 									((1 - compressedSize / originalSize) * 100).toFixed(1)
 								)}
 							</p>
-							<button
-								onclick={downloadCompressed}
-								class="mt-4 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
-							>
+							<button onclick={downloadCompressed} class="primary-button mt-4">
 								{$uiText.compress.download}
 							</button>
 						{:else if isCompressing}
-							<p class="mt-4 text-blue-600">{$uiText.compress.compressing(progress)}</p>
+							<p class="mt-4 font-medium text-[var(--app-accent)]">
+								{$uiText.compress.compressing(progress)}
+							</p>
 						{/if}
 						{#if status}
-							<p class="mt-6 text-center text-sm font-medium text-gray-700 dark:text-slate-300">
-								{status}
-							</p>
+							<p class="status-copy mt-6 text-center">{status}</p>
 						{/if}
 					</div>
 				{/if}
-			</div>
 		</div>
 	</div>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '../app.css';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { page } from '$app/state';
@@ -28,35 +29,31 @@
 	<!-- <link rel="icon" href={favicon} /> -->
 	<title>{$uiText.appTitle}</title>
 </svelte:head>
-<div class="flex min-h-screen flex-col rounded-2xl bg-gray-50 text-gray-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
-	<header class="flex flex-col gap-4 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-0">
-		<h1 class="rounded-2xl text-gray-600 dark:text-slate-200">
-			<a class="px-5 text-4xl font-bold tracking-tight md:text-5xl" href="/">{$uiText.appTitle}</a>
-		</h1>
-		<div class="w-full md:flex-1">
-			<nav class="bg-primary px-4 md:px-0">
-				<div class="mx-auto flex max-w-6xl items-center justify-between gap-6">
-					<ul class="flex items-center space-x-6">
+<div class="app-shell">
+	<header class="app-container relative z-30 pt-8 sm:pt-10">
+		<div class="flex flex-col gap-6">
+			<div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+				<div class="space-y-3">
+					<a class="brand-mark" href="/">{$uiText.appTitle}</a>
+					<p class="shell-copy">{$uiText.shellCopy}</p>
+				</div>
+			</div>
+			<nav class="glass-nav">
+				<ul class="nav-list">
 					{#each menu as item}
 						<li>
 							<a
 								href={item.href}
-								class="
-              flex-1 py-5 text-center font-medium transition-colors
-              {page.url.pathname === item.href
-									? 'border-primary text-primary border-b-4 dark:text-sky-400'
-									: 'text-gray-600 hover:text-gray-900 dark:text-slate-300 dark:hover:text-white'}
-            "
+								class="nav-link"
+								class:is-active={page.url.pathname === item.href}
 							>
 								{$uiText.nav[item.labelKey]}
 							</a>
 						</li>
 					{/each}
-					</ul>
+				</ul>
 					<details class="relative">
-						<summary
-							class="flex cursor-pointer list-none items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-gray-400 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800"
-						>
+						<summary class="settings-trigger list-none text-sm font-medium">
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path
 									stroke-linecap="round"
@@ -73,55 +70,45 @@
 							</svg>
 							{$uiText.settings.button}
 						</summary>
-						<div
-							class="absolute right-0 z-20 mt-3 w-72 rounded-2xl border border-gray-200 bg-white p-4 shadow-xl dark:border-slate-700 dark:bg-slate-900"
-						>
+						<div class="settings-menu">
 							<div class="space-y-4">
 								<div>
-									<p class="mb-2 text-sm font-semibold text-gray-800 dark:text-slate-100">
-										{$uiText.settings.language}
-									</p>
-									<div class="inline-flex rounded-lg border border-gray-300 bg-gray-50 p-1 dark:border-slate-700 dark:bg-slate-800">
+									<p class="settings-label">{$uiText.settings.language}</p>
+									<div class="segmented-control">
 										<button
 											type="button"
 											onclick={() => handleLanguageChange('en')}
-											class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$language === 'en'
-												? 'bg-gray-900 text-white dark:bg-sky-500 dark:text-slate-950'
-												: 'text-gray-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'}"
+											class="segmented-button"
+											class:is-active={$language === 'en'}
 										>
 											{$uiText.languageToggle.english}
 										</button>
 										<button
 											type="button"
 											onclick={() => handleLanguageChange('vi')}
-											class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$language === 'vi'
-												? 'bg-gray-900 text-white dark:bg-sky-500 dark:text-slate-950'
-												: 'text-gray-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'}"
+											class="segmented-button"
+											class:is-active={$language === 'vi'}
 										>
 											{$uiText.languageToggle.vietnamese}
 										</button>
 									</div>
 								</div>
 								<div>
-									<p class="mb-2 text-sm font-semibold text-gray-800 dark:text-slate-100">
-										{$uiText.settings.theme}
-									</p>
-									<div class="inline-flex rounded-lg border border-gray-300 bg-gray-50 p-1 dark:border-slate-700 dark:bg-slate-800">
+									<p class="settings-label">{$uiText.settings.theme}</p>
+									<div class="segmented-control">
 										<button
 											type="button"
 											onclick={() => handleThemeChange('light')}
-											class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$theme === 'light'
-												? 'bg-gray-900 text-white'
-												: 'text-gray-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'}"
+											class="segmented-button"
+											class:is-active={$theme === 'light'}
 										>
 											{$uiText.settings.light}
 										</button>
 										<button
 											type="button"
 											onclick={() => handleThemeChange('dark')}
-											class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors {$theme === 'dark'
-												? 'bg-sky-500 text-slate-950'
-												: 'text-gray-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-700'}"
+											class="segmented-button"
+											class:is-active={$theme === 'dark'}
 										>
 											{$uiText.settings.dark}
 										</button>
@@ -130,17 +117,17 @@
 							</div>
 						</div>
 					</details>
-				</div>
 			</nav>
 		</div>
 	</header>
 
-	<main class="flex flex-col bg-gray-50 transition-colors dark:bg-slate-950">
+	<main class="relative z-10 flex flex-1 flex-col">
 		{@render children()}
 	</main>
 
-	<footer class="mt-auto border-t border-gray-200 bg-white py-6 text-center text-sm text-gray-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
-		<div class="flex items-center justify-center gap-3 text-gray-600 dark:text-slate-300">
+	<footer class="app-container mt-auto py-6">
+		<div class="divider-line mb-6"></div>
+		<div class="flex items-center justify-center gap-3 text-center text-sm text-gray-600 dark:text-slate-300">
 			<span class="text-sm font-medium"
 				>{$uiText.footer.craftedBy}
 				<span class="font-bold">Le Quang Hy</span></span
