@@ -192,7 +192,7 @@
 									((1 - compressedSize / originalSize) * 100).toFixed(1)
 								)}
 							</p>
-							<button onclick={downloadCompressed} class="primary-button mt-4">
+							<button onclick={downloadCompressed} class="primary-button mt-4 sm:w-auto">
 								{$uiText.compress.download}
 							</button>
 						{:else if isCompressing}

@@ -210,7 +210,7 @@
 					</div>
 
 					<div class="mt-8">
-						<div class="mb-4 flex gap-6">
+						<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:gap-6">
 							<label class="flex cursor-pointer items-center gap-2">
 								<input type="radio" bind:group={splitMode} value="per-page" />
 								{$uiText.split.perPageOption}
@@ -246,7 +246,7 @@
 					<button
 						onclick={splitPDF}
 						disabled={!splitPdfDoc || isSplitting || (splitMode === 'range' && !rangeInput.trim())}
-						class="primary-button"
+						class="primary-button sm:w-auto"
 					>
 						{isSplitting
 							? $uiText.split.buttonBusy

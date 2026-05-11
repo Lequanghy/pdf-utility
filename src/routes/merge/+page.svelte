@@ -160,7 +160,7 @@
 
 				{#if mergeFiles.length > 0}
 					<div class="mt-8">
-						<div class="mb-4 flex items-center justify-between gap-4">
+						<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 							<div>
 								<p class="text-sm font-medium text-[var(--app-text)]">{$uiText.merge.orderTitle}</p>
 								<p class="meta-copy">{$uiText.merge.orderDescription}</p>
@@ -202,7 +202,7 @@
 											</p>
 										</div>
 									</div>
-									<div class="flex shrink-0 items-center gap-2">
+									<div class="queue-actions shrink-0">
 										<button
 											type="button"
 											onclick={() => moveMergeFile(i, i - 1)}
@@ -239,7 +239,7 @@
 						id="mergeBtn"
 						onclick={mergePDFs}
 						disabled={mergeFiles.length === 0 || isMerging}
-						class="primary-button"
+						class="primary-button sm:w-auto"
 					>
 						{isMerging ? 'Merging…' : $uiText.merge.mergeButton(mergeFiles.length)}
 					</button>

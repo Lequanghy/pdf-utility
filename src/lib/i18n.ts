@@ -36,7 +36,8 @@ export const translations = {
 		nav: {
 			merge: 'Merge',
 			split: 'Split',
-			compress: 'Compress'
+			compress: 'Compress',
+			menu: 'PDF Actions'
 		},
 		languageToggle: {
 			label: 'Language',
@@ -138,7 +139,8 @@ export const translations = {
 		nav: {
 			merge: 'Ghép',
 			split: 'Tách',
-			compress: 'Nén'
+			compress: 'Nén',
+			menu: 'Tác vụ PDF'
 		},
 		languageToggle: {
 			label: 'Ngôn ngữ',

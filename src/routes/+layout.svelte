@@ -39,7 +39,7 @@
 				</div>
 			</div>
 			<nav class="glass-nav">
-				<ul class="nav-list">
+				<ul class="nav-list desktop-nav">
 					{#each menu as item}
 						<li>
 							<a
@@ -52,7 +52,33 @@
 						</li>
 					{/each}
 				</ul>
-					<details class="relative">
+				<details class="mobile-nav-popover">
+					<summary class="settings-trigger mobile-nav-trigger list-none text-sm font-medium">
+						<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="1.5"
+								d="M4 6h16M4 12h16M4 18h16"
+							/>
+						</svg>
+						{$uiText.nav.menu}
+					</summary>
+					<div class="mobile-nav-menu">
+						<div class="mobile-nav-stack">
+							{#each menu as item}
+								<a
+									href={item.href}
+									class="mobile-nav-link"
+									class:is-active={page.url.pathname === item.href}
+								>
+									{$uiText.nav[item.labelKey]}
+								</a>
+							{/each}
+						</div>
+					</div>
+				</details>
+					<details class="settings-popover">
 						<summary class="settings-trigger list-none text-sm font-medium">
 							<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path

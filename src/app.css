@@ -1,6 +1,7 @@
 @layer base {
 	html {
 		color-scheme: light;
+		scroll-behavior: smooth;
 	}
 
 	html.dark {
@@ -68,6 +69,12 @@
 			radial-gradient(circle at 82% 12%, rgba(14, 165, 233, 0.14), transparent 20%),
 			radial-gradient(circle at bottom right, rgba(59, 130, 246, 0.14), transparent 28%),
 			linear-gradient(180deg, rgba(9, 17, 31, 0.98), rgba(9, 17, 31, 1));
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
 	}
 }
 
@@ -167,6 +174,14 @@
 		gap: 0.55rem;
 	}
 
+	.nav-list > li {
+		flex: 0 0 auto;
+	}
+
+	.desktop-nav {
+		display: flex;
+	}
+
 	.nav-link {
 		display: inline-flex;
 		align-items: center;
@@ -237,6 +252,66 @@
 		background: var(--app-surface-strong);
 		backdrop-filter: blur(26px);
 		box-shadow: var(--app-shadow);
+	}
+
+	.settings-popover {
+		position: relative;
+	}
+
+	.mobile-nav-popover {
+		position: relative;
+		display: none;
+	}
+
+	.mobile-nav-trigger {
+		display: inline-flex;
+	}
+
+	.mobile-nav-menu {
+		position: absolute;
+		right: 0;
+		z-index: 20;
+		width: min(18rem, calc(100vw - 2rem));
+		margin-top: 0.85rem;
+		padding: 0.75rem;
+		border: 1px solid var(--app-border);
+		border-radius: 1.35rem;
+		background: var(--app-surface-strong);
+		backdrop-filter: blur(26px);
+		box-shadow: var(--app-shadow);
+	}
+
+	.mobile-nav-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+	}
+
+	.mobile-nav-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.85rem 1rem;
+		border-radius: 1rem;
+		font-size: 0.95rem;
+		font-weight: 560;
+		color: var(--app-muted);
+		transition:
+			background-color 160ms ease,
+			color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.mobile-nav-link:hover {
+		background: rgba(255, 255, 255, 0.64);
+		color: var(--app-text);
+		transform: translateY(-1px);
+	}
+
+	.mobile-nav-link.is-active {
+		background: linear-gradient(135deg, rgba(10, 132, 255, 0.18), rgba(125, 211, 252, 0.22));
+		color: var(--app-text);
+		box-shadow: inset 0 0 0 1px rgba(10, 132, 255, 0.14);
 	}
 
 	.settings-label {
@@ -478,6 +553,14 @@
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
 	}
 
+	.queue-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.5rem;
+	}
+
 	.queue-index {
 		display: inline-flex;
 		align-items: center;
@@ -598,5 +681,122 @@
 	.divider-line {
 		height: 1px;
 		background: linear-gradient(90deg, transparent, var(--app-border-strong), transparent);
+	}
+
+	@media (max-width: 640px) {
+		.app-container {
+			padding-left: 0.85rem;
+			padding-right: 0.85rem;
+		}
+
+		.shell-copy {
+			font-size: 0.92rem;
+			line-height: 1.6;
+		}
+
+		.glass-nav {
+			align-items: stretch;
+			padding: 0.75rem;
+			border-radius: 1.35rem;
+		}
+
+		.desktop-nav {
+			display: none;
+		}
+
+		.mobile-nav-popover {
+			display: block;
+			flex: 1 1 0%;
+		}
+
+		.mobile-nav-trigger {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.settings-popover {
+			width: 100%;
+			flex: 1 1 0%;
+		}
+
+		.settings-trigger {
+			width: 100%;
+			justify-content: center;
+			padding-left: 0.9rem;
+			padding-right: 0.9rem;
+		}
+
+		.settings-menu {
+			left: 0;
+			right: 0;
+			width: 100%;
+			margin-top: 0.7rem;
+			padding: 0.9rem;
+		}
+
+		.mobile-nav-menu {
+			left: 0;
+			right: 0;
+			width: 100%;
+			margin-top: 0.7rem;
+		}
+
+		.segmented-control {
+			width: 100%;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.segmented-button {
+			min-width: 0;
+			padding-left: 0.75rem;
+			padding-right: 0.75rem;
+			font-size: 0.84rem;
+		}
+
+		.page-shell {
+			padding: 1.15rem 0.85rem 3rem;
+		}
+
+		.hero-panel,
+		.tool-panel {
+			border-radius: 1.45rem;
+		}
+
+		.dropzone-panel {
+			padding: 2.1rem 1rem;
+			border-radius: 1.35rem;
+		}
+
+		.dropzone-icon {
+			width: 3.2rem;
+			height: 3.2rem;
+		}
+
+		.dropzone-title {
+			font-size: 1.03rem;
+		}
+
+		.dropzone-copy {
+			font-size: 0.9rem;
+			line-height: 1.55;
+		}
+
+		.queue-card {
+			flex-direction: column;
+			align-items: stretch;
+			padding: 0.9rem;
+		}
+
+		.queue-actions {
+			width: 100%;
+			justify-content: flex-end;
+		}
+
+		.primary-button,
+		.ghost-button,
+		.danger-button {
+			width: 100%;
+		}
 	}
 }
