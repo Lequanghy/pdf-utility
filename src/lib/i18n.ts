@@ -41,6 +41,13 @@ export const translations = {
 			english: 'English',
 			vietnamese: 'Tiếng Việt'
 		},
+		settings: {
+			button: 'Settings',
+			language: 'Language',
+			theme: 'Theme',
+			light: 'Light',
+			dark: 'Dark'
+		},
 		footer: {
 			craftedBy: 'Crafted by'
 		},
@@ -133,6 +140,13 @@ export const translations = {
 			label: 'Ngôn ngữ',
 			english: 'English',
 			vietnamese: 'Tiếng Việt'
+		},
+		settings: {
+			button: 'Cài đặt',
+			language: 'Ngôn ngữ',
+			theme: 'Giao diện',
+			light: 'Sáng',
+			dark: 'Tối'
 		},
 		footer: {
 			craftedBy: 'Được tạo bởi'

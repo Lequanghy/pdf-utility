@@ -117,10 +117,14 @@
 
 <div class="flex-col items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
 	<div class="flex items-center justify-center">
-		<div class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl">
+		<div
+			class="w-full max-w-4xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-slate-900 dark:shadow-slate-950/40"
+		>
 			<div class="px-8 py-10">
-				<h2 class="mb-3 text-2xl font-bold text-gray-900">{$uiText.compress.title}</h2>
-				<p class="mb-6 text-gray-600">{$uiText.compress.description}</p>
+				<h2 class="mb-3 text-2xl font-bold text-gray-900 dark:text-slate-100">
+					{$uiText.compress.title}
+				</h2>
+				<p class="mb-6 text-gray-600 dark:text-slate-400">{$uiText.compress.description}</p>
 				<label
 					for="file-input"
 					class="block cursor-pointer rounded-xl border-2 border-dashed border-blue-400 bg-blue-50 p-10 text-center hover:bg-blue-100"
@@ -154,10 +158,14 @@
 						/>
 					</svg>
 					{#if dragging}
-						<p class="text-xl font-medium text-green-700">{$uiText.compress.dropActive}</p>
+						<p class="text-xl font-medium text-green-700 dark:text-slate-800">
+							{$uiText.compress.dropActive}
+						</p>
 					{:else}
-						<p class="text-xl font-medium text-gray-800">{$uiText.compress.dropIdle}</p>
-						<p class="mt-2 text-gray-600">{$uiText.compress.dropHelp}</p>
+						<p class="text-xl font-medium text-gray-800 dark:text-slate-800">
+							{$uiText.compress.dropIdle}
+						</p>
+						<p class="mt-2 text-gray-600 dark:text-slate-600">{$uiText.compress.dropHelp}</p>
 					{/if}
 				</label>
 				{#if compressDropStatus}
@@ -171,7 +179,9 @@
 				{/if}
 				{#if compressFile}
 					<div class="mt-8 space-y-3">
-						<div class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3">
+						<div
+							class="flex items-center justify-between rounded-lg bg-gray-100 px-5 py-3 dark:bg-slate-800"
+						>
 							<div class="flex min-w-0 flex-1 items-center gap-3">
 								<svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
 									<path
@@ -180,7 +190,7 @@
 								</svg>
 								<div class="min-w-0 flex-1">
 									<p class="truncate font-medium">{compressFile.name}</p>
-									<p class="text-sm text-gray-500">
+									<p class="text-sm text-gray-500 dark:text-slate-400">
 										{(compressFile.size / 1024 / 1024).toFixed(2)} MB
 									</p>
 								</div>
@@ -189,12 +199,12 @@
 					</div>
 				{/if}
 				{#if compressFile}
-					<div class="mt-8 rounded-lg bg-white p-6 text-center">
+					<div class="mt-8 rounded-lg bg-white p-6 text-center dark:bg-slate-900">
 						{#if compressedBlob}
 							<p class="mt-2 font-medium text-green-700">
 								{$uiText.compress.compressedSummary(
 									(compressedSize / 1024 / 1024).toFixed(2),
-									(((1 - compressedSize / originalSize) * 100).toFixed(1))
+									((1 - compressedSize / originalSize) * 100).toFixed(1)
 								)}
 							</p>
 							<button
@@ -207,7 +217,9 @@
 							<p class="mt-4 text-blue-600">{$uiText.compress.compressing(progress)}</p>
 						{/if}
 						{#if status}
-							<p class="mt-6 text-center text-sm font-medium text-gray-700">{status}</p>
+							<p class="mt-6 text-center text-sm font-medium text-gray-700 dark:text-slate-300">
+								{status}
+							</p>
 						{/if}
 					</div>
 				{/if}
